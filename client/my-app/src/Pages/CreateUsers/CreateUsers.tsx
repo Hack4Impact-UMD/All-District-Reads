@@ -4,7 +4,6 @@ import "./CreateUsers.css";
 import React, { useState, useEffect } from "react";
 import {
   getAuth,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import {
@@ -20,8 +19,8 @@ import {
   createSchoolStaffUser,
 } from "../../backend/cloudFunctionCalls";
 import { useNavigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "../../Components/Auth/AuthProvider";
-
+import { useAuth } from "../../Components/Auth/AuthProvider";
+import Alert from '@mui/material/Alert';
 
 // Initialize Firebase app
 let firebaseApp: FirebaseApp;
@@ -59,20 +58,28 @@ const CreateUsers: React.FC = () =>{
       default:
         return []; // Empty array if no creation rights
     }
-  }; // Empty array if no creation rights
+  };
+
+  const getDisplayName = (type: UserType): string => {
+    switch (type) {
+      case UserType.ADRAdmin:
+        return "ADRA Admin";
+      case UserType.ADRStaff:
+        return "ADR Staff";
+      case UserType.SchoolStaff:
+        return "School Staff";
+      default:
+        return "";
+    }
+  };
    
-  
   const [newUserType, setNewUserType] = useState<UserType>();
-  const [message, setMessage] = useState("");
   const [registrationEmail, setRegistrationEmail] = useState("");
   const [registrationPassword, setRegistrationPassword] = useState("");
-  const [registrationButtonClicked, setRegistrationButtonClicked] =
-    useState(false); // State to track if registration button is clicked
   const [registrationError, setRegistrationError] = useState(""); // State to store registration error message
+  const [registrationSuccess, setRegistrationSuccess] = useState(false); // State to track registration success
   const [currentPage, setCurrentPage] = useState<"home" | "wrong" | null>(null); // State to track current page
   const navigate = useNavigate();
-
-  
 
   const handleRegister = async () => {
     const auth = getAuth(firebaseApp);
@@ -81,48 +88,39 @@ const CreateUsers: React.FC = () =>{
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         registrationEmail,
-        registrationPassword,
+        registrationPassword
       );
 
       const userId = userCredential.user.uid;
 
-      if (newUserType == UserType.ADRAdmin) {
+      if (newUserType === UserType.ADRAdmin) {
         await createAdminUser(userId, registrationEmail);
-      }
-
-      if (newUserType == UserType.ADRStaff) {
+      } else if (newUserType === UserType.ADRStaff) {
         await createADRStaffUser(userId, registrationEmail);
-      }
-
-      if (newUserType == UserType.SchoolStaff) {
+      } else if (newUserType === UserType.SchoolStaff) {
         await createSchoolStaffUser(userId, registrationEmail);
       }
-      console.log("Registration successful:", userCredential.user);
-      setRegistrationButtonClicked(true); // Set registrationButtonClicked to true when registration button is clicked
+
+      setRegistrationSuccess(true);
       setRegistrationError("");
-      setRegistrationEmail(""); // Clear email input
-      setRegistrationPassword(""); // Clear password input
-      // Optionally, you can redirect to another page after successful registration
+      setRegistrationEmail(""); 
+      setRegistrationPassword(""); 
     } catch (error: any) {
       console.error("Registration error:", error.message);
       setRegistrationError("Registration error: " + error.message);
-    }
-  };
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case "home":
-        return <div>Registeration Success!</div>;
-      case "wrong":
-        return <div>Registeration not successful</div>;
-      default:
-        return null;
+      setRegistrationSuccess(false);
     }
   };
 
   return (
     <div className="user-container">
       <div className="user-form-container">
+        {registrationSuccess && (
+          <Alert severity="success">User Successfully Created!</Alert>
+        )}
+        {registrationError && (
+          <Alert severity="error">{registrationError}</Alert>
+        )}
         <img
           src="https://alldistrictreads.org/wp-content/uploads/2023/07/All-District-Reads.png"
           alt="navbar-logo"
@@ -141,7 +139,7 @@ const CreateUsers: React.FC = () =>{
                 checked={newUserType === type}
                 onChange={(e) => setNewUserType(e.target.value as UserType)}
               />
-              <span>{type}</span>
+              <span>{getDisplayName(type)}</span>
             </label>
           ))}
         </div>
@@ -161,11 +159,7 @@ const CreateUsers: React.FC = () =>{
           className="user-input-field"
         />
         <button onClick={handleRegister}>Create User</button>
-        {registrationError && <p>{registrationError}</p>}
-        {registrationButtonClicked && <p>Register button clicked!</p>}
-        {renderPage()}
-
-        <p>{message}</p>
+        
       </div>
     </div>
   );

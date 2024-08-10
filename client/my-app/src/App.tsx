@@ -6,7 +6,6 @@ import {
   useLocation,
 } from "react-router-dom";
 import Home from "./Pages/Home/Home";
-import Dashboard from "./Pages/Dashboard/Dashboard";
 import Library from "./Pages/Library/Library";
 import { FirebaseOptions, initializeApp, getApps } from "firebase/app";
 import Login from "./Pages/Login/Login";
@@ -19,6 +18,7 @@ import RequireAdminAuth from "./Components/Auth/RequireAdminAuth/RequireAdminAut
 import RequireADRStaffAuth from "./Components/Auth/RequireADRStaffAuth/RequireADRStaffAuth";
 import RequireSchoolStaffAuth from "./Components/Auth/RequireSchoolStaffAuth/RequireSchoolStaffAuth";
 import { AuthProvider, useAuth } from "./Components/Auth/AuthProvider";
+import ReadingScheduleBottom from "./Pages/ReadingSchedule/ReadingScheduleBottom";
 
 
 
@@ -36,20 +36,36 @@ const App: React.FC = () => {
       <AuthProvider>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+
         <Route path="/library" 
           element={
-          <RequireAdminAuth>
+          //<RequireAdminAuth>
             <Library />
-          </RequireAdminAuth>
+          //</RequireAdminAuth>
           }
         />
         
-        <Route path="/schedule" 
+        <Route path="/schedule/add" 
           element={
-          <RequireSchoolStaffAuth>
+          //<RequireSchoolStaffAuth>
             <ReadingSchedule />
-          </RequireSchoolStaffAuth>
+          //</RequireSchoolStaffAuth>
+          } 
+        />
+
+        <Route path="/schedule/schoolDistrict/:schoolDistrictId" 
+          element={
+          //<RequireSchoolStaffAuth>
+            <ReadingScheduleBottom />
+          //</RequireSchoolStaffAuth>
+          } 
+        />
+
+        <Route path="/schedule/schoolDistrict/:schoolDistrictId/assignment/:assignmentId" 
+          element={
+          //<RequireSchoolStaffAuth>
+            <ReadingSchedule />
+          //</RequireSchoolStaffAuth>
           } 
         />
         

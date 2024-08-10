@@ -16,9 +16,6 @@ const Navbar: React.FC = () => {
         <a href="/createUsers" className="nav-link">
           CREATE USERS
         </a>
-        <a href="/dashboard" className="nav-link">
-          DASHBOARD
-        </a>
       </div>
     </nav>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../../config/firebase";
-import { collection, getDocs, doc, setDoc } from "firebase/firestore";
+import { collection, getDocs, doc, setDoc, getDoc } from "firebase/firestore"; // Import getDoc
 import {
   FormControl,
   InputLabel,
@@ -15,7 +15,8 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import styles from "./ReadingSchedule.module.css";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from 'dayjs';
+import { useParams } from "react-router-dom"; // Import useParams
 
 type Chapter = {
   chapterId: string;
@@ -32,6 +33,7 @@ type Book = {
   imageUrl?: string;
 };
 
+
 const ReadingSchedule = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<string>("");
@@ -45,6 +47,8 @@ const ReadingSchedule = () => {
   const [chapterAssignmentTitle, setChapterAssignmentTitle] = useState("");
   const [assignmentDescription, setAssignmentDescription] = useState("");
   const [url, setUrl] = useState("");
+
+  const { schoolDistrictId, assignmentId } = useParams(); // Get the parameters from the URL
 
   // Fetch all books
   useEffect(() => {
@@ -63,6 +67,29 @@ const ReadingSchedule = () => {
     fetchBooks();
   }, []);
 
+  // Fetch assignment data for editing
+  useEffect(() => {
+    const fetchAssignment = async () => {
+      if (assignmentId) {
+        const assignmentDocRef = doc(db, "readingSchedules", assignmentId);
+        const assignmentDoc = await getDoc(assignmentDocRef);
+        if (assignmentDoc.exists()) {
+          const data = assignmentDoc.data();
+          setSelectedBook(data.bookId || "");
+          setSelectedChapter(data.chapterId || "");
+          setChapterAssignmentTitle(data.title || "");
+          setAssignmentDescription(data.desc || "");
+          setSelectedReadingPeriod(data.readingPeriod || "");
+          setDate(data.dueDate ? dayjs(data.dueDate, "MM/DD") : null);
+          setSelectedQuestions(data.selectedQuestions || []);
+          setUrl(data.url || "");
+        }
+      }
+    };
+
+    fetchAssignment();
+  }, [assignmentId]);
+
   // Fetch chapters when a book is selected
   useEffect(() => {
     if (!selectedBook) return;
@@ -72,9 +99,9 @@ const ReadingSchedule = () => {
       const snapshot = await getDocs(chaptersRef);
       const chaptersData: Chapter[] = snapshot.docs.map((doc) => ({
         chapterId: doc.id,
-        chapterNumber: doc.data().chapterNumber, // Make sure your data model matches this
+        chapterNumber: doc.data().chapterNumber,
         questions: doc.data().questions || [],
-        answers: doc.data().answers || [], // Assuming questions are stored directly
+        answers: doc.data().answers || [],
       }));
       setChapters(chaptersData);
     };
@@ -111,16 +138,16 @@ const ReadingSchedule = () => {
       chapterId: selectedChapter,
       title: chapterAssignmentTitle,
       desc: assignmentDescription,
-      createdBy: "1", // This should be dynamically set based on the user (e.g., from auth)
+      createdBy: "1",
       readingPeriod: selectedReadingPeriod,
-      dueDate: date?.format("MM/DD"), // Formatting the date to match your Firestore format
-      schoolDistrictId: "District 1",
+      dueDate: date?.format("MM/DD"),
+      schoolDistrictId: schoolDistrictId || "Unknown",
       selectedQuestions: selectedQuestions,
       url: url,
     };
 
     try {
-      const docRef = doc(collection(db, "readingSchedules"));
+      const docRef = doc(db, "readingSchedules", assignmentId || doc(collection(db, "readingSchedules")).id);
       await setDoc(docRef, newReadingSchedule);
       alert("Reading schedule saved successfully!");
     } catch (error) {
@@ -165,7 +192,7 @@ const ReadingSchedule = () => {
   return (
     <div className={styles.page}>
       <div className={styles.pageTop}>
-        <h1 className={styles.pageTitle}>New Book Assignment</h1>
+        <h1 className={styles.pageTitle}>{assignmentId ? "Edit Book Assignment" : "New Book Assignment"}</h1>
         <div className={styles.selectBookContainer}>
           <FormControl
             fullWidth
@@ -173,7 +200,7 @@ const ReadingSchedule = () => {
               gap: "10px",
               justifyContent: "center",
               display: "flex",
-              flexDirection: "colum",
+              flexDirection: "column",
             }}
           >
             <InputLabel>Select Book</InputLabel>
@@ -182,13 +209,13 @@ const ReadingSchedule = () => {
               label="Select Book"
               onChange={(e) => setSelectedBook(e.target.value)}
               sx={{
-                backgroundColor: "#0071ba", // Change the background color to blue
-                color: "white", // Change text color to white
+                backgroundColor: "#0071ba",
+                color: "white",
                 "& .MuiInputBase-input": {
-                  color: "white", // Change the text color to white
+                  color: "white",
                 },
                 "& .MuiSelect-icon": {
-                  color: "white", // Change the icon color to white
+                  color: "white",
                 },
               }}
             >
@@ -207,9 +234,9 @@ const ReadingSchedule = () => {
               onBlur={handleBlur}
               onChange={(e) => setSelectedReadingPeriod(e.target.value)}
               sx={{
-                backgroundColor: "#0071ba", // Change the background color to blue
+                backgroundColor: "#0071ba",
                 "& .MuiInputBase-input": {
-                  color: "white", // Change the text color to white
+                  color: "white",
                 },
               }}
             />
@@ -295,11 +322,9 @@ const ReadingSchedule = () => {
       </div>
       <div className={styles.saveButtonContainer}>
         <button className="save-chapter" onClick={handleSaveChapter}>
-          Save Chapter
+          {assignmentId ? "Update Chapter" : "Save Chapter"}
         </button>
       </div>
-
-      <ReadingScheduleBottom />
     </div>
   );
 };

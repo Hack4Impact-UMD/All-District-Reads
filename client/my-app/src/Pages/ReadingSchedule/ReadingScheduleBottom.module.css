@@ -10,6 +10,28 @@ h1 {
   color: white;
 }
 
+h3{
+  margin-left: 1%;
+  color: black;
+  font-weight: 250;
+  color: #0071ba;
+}
+
+.pageTop {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background-color: #0071ba;
+}
+
+.pageTitle {
+  font-size: 37px;
+  color: white;
+  font-weight: 600;
+}
+
 .assignment-container {
   background-color: white;
   padding: 1%;
@@ -58,3 +80,23 @@ h1 {
 .delete {
   background: none;
 }
+
+.assignmentTitleCell {
+  position: relative;
+}
+
+.assignmentTitleBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.iconContainer {
+  display: none;
+  margin-left: 10px;
+}
+
+.assignmentTitleCell:hover .iconContainer {
+  display: flex;
+}
+
