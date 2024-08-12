@@ -10,15 +10,14 @@ import Library from "./Pages/Library/Library";
 import { FirebaseOptions, initializeApp, getApps } from "firebase/app";
 import Login from "./Pages/Login/Login";
 import firebaseConfig from "./config/firebase";
-import ReadingSchedule from "./Pages/ReadingSchedule/ReadingSchedule";
+import ReadingAssignment from "./Pages/ReadingSchedule/ReadingAssignment";
 import CreateUsers from "./Pages/CreateUsers/CreateUsers";
 import { UserType } from "./types/types";
 import Navbar from "./Components/Navbar/Navbar";
-import RequireAdminAuth from "./Components/Auth/RequireAdminAuth/RequireAdminAuth";
-import RequireADRStaffAuth from "./Components/Auth/RequireADRStaffAuth/RequireADRStaffAuth";
+import RequireADRAuth from "./Components/Auth/RequireAdminAuth/RequireADRAuth";
 import RequireSchoolStaffAuth from "./Components/Auth/RequireSchoolStaffAuth/RequireSchoolStaffAuth";
 import { AuthProvider, useAuth } from "./Components/Auth/AuthProvider";
-import ReadingScheduleBottom from "./Pages/ReadingSchedule/ReadingScheduleBottom";
+import ReadingSchedule from "./Pages/ReadingSchedule/ReadingSchedule";
 
 
 
@@ -39,33 +38,33 @@ const App: React.FC = () => {
 
         <Route path="/library" 
           element={
-          //<RequireAdminAuth>
-            <Library />
-          //</RequireAdminAuth>
+            <RequireADRAuth>
+              <Library />
+            </RequireADRAuth>
           }
         />
         
         <Route path="/schedule/add" 
           element={
-          //<RequireSchoolStaffAuth>
-            <ReadingSchedule />
-          //</RequireSchoolStaffAuth>
+          <RequireSchoolStaffAuth>
+            <ReadingAssignment />
+          </RequireSchoolStaffAuth>
           } 
         />
 
         <Route path="/schedule/schoolDistrict/:schoolDistrictId" 
           element={
-          //<RequireSchoolStaffAuth>
-            <ReadingScheduleBottom />
-          //</RequireSchoolStaffAuth>
+          <RequireSchoolStaffAuth>
+            <ReadingSchedule />
+          </RequireSchoolStaffAuth>
           } 
         />
 
         <Route path="/schedule/schoolDistrict/:schoolDistrictId/assignment/:assignmentId" 
           element={
-          //<RequireSchoolStaffAuth>
-            <ReadingSchedule />
-          //</RequireSchoolStaffAuth>
+          <RequireSchoolStaffAuth>
+            <ReadingAssignment />
+          </RequireSchoolStaffAuth>
           } 
         />
         
@@ -73,7 +72,11 @@ const App: React.FC = () => {
 
         <Route
           path="/createUsers"
-          element={<CreateUsers/>}
+          element={
+            <RequireADRAuth>
+              <CreateUsers/>
+            </RequireADRAuth>
+        }
         />
       </Routes>
       </AuthProvider>

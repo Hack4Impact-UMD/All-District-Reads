@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   getAuth,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import {
   FirebaseApp,
@@ -10,9 +10,19 @@ import {
   initializeApp,
   getApp,
 } from "firebase/app";
-import firebaseConfig from "../../config/firebase"; // Make sure to provide the correct path to your Firebase config
-import "./Login.css"; // Import the updated CSS file
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import firebaseConfig from "../../config/firebase";
 import { useNavigate } from "react-router-dom";
+import adrLogo from "./ADR_web_logo.png";
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import "./Login.css";
+import { db } from "../../config/firebase";
 
 // Initialize Firebase app
 let firebaseApp: FirebaseApp;
@@ -25,32 +35,75 @@ try {
 function Login() {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-  const [loginButtonClicked, setLoginButtonClicked] = useState(false); // State to track if login button is clicked
-  const [loginError, setLoginError] = useState(""); // State to store login error message
-  const [currentPage, setCurrentPage] = useState<"home" | "wrong" | null>(null); // State to track current page
+  const [loginError, setLoginError] = useState("");
+  const [currentPage, setCurrentPage] = useState<"home" | "wrong" | null>(null);
+  const [resetPasswordMessage, setResetPasswordMessage] = useState("");
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const navigate = useNavigate();
-  const goToHome = () => navigate("/home");
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [userType, setUserType] = useState<string | null>(null);
+  const [schoolDistrictId, setSchoolDistrictId] = useState<string | null>(null);
 
   const handleLogin = async () => {
     const auth = getAuth(firebaseApp);
+    const firestore = getFirestore(firebaseApp);
 
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
         loginEmail,
-        loginPassword,
+        loginPassword
       );
+      const user = userCredential.user;
+
+      // Retrieve user data from Firestore
+      const userDocRef = doc(firestore, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setUserType(userData?.userType || null);
+        console.log(userData.userType);
+        setSchoolDistrictId(userData?.schoolDistrictId || "Unknown");
+        console.log(userData.schoolDistrictId);
+      } else {
+        setLoginError("User data not found");
+      }
+
       setCurrentPage("home");
-      console.log("Login successful:", userCredential.user);
-      setLoginButtonClicked(true); // Set loginButtonClicked to true when login button is clicked
       setLoginError("");
       setLoginEmail(""); // Clear email input
       setLoginPassword(""); // Clear password input
-      goToHome();
     } catch (error: any) {
       setCurrentPage("wrong");
       console.error("Login error:", error.message);
       setLoginError("Login error: " + error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (userType) {
+      if (userType === "ADRAdmin" || userType === "ADRStaff") {
+        navigate("/library");
+      } else if (userType === "SchoolStaff" && schoolDistrictId) {
+        navigate(`/schedule/schoolDistrict/${schoolDistrictId}`);
+      } else {
+        setLoginError("User type not recognized");
+      }
+    }
+  }, [userType, schoolDistrictId, navigate]);
+
+  const handleForgotPassword = async () => {
+    const auth = getAuth(firebaseApp);
+    try {
+      await sendPasswordResetEmail(auth, forgotPasswordEmail);
+      setResetPasswordMessage("Password reset email sent!");
+      setForgotPasswordEmail(""); // Clear the forgot password input field
+      setOpenDialog(false); // Close the dialog after sending the email
+    } catch (error: any) {
+      console.error("Error sending password reset email:", error.message);
+      setResetPasswordMessage("Error: " + error.message);
     }
   };
 
@@ -65,6 +118,14 @@ function Login() {
     }
   };
 
+  const handleDialogOpen = () => {
+    setOpenDialog(true);
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
+
   return (
     <div className="login-outer-container">
       <div className="login-container">
@@ -72,12 +133,8 @@ function Login() {
           <div className="login-image" />
         </div>
         <div className="login-form-container">
-          <img
-            src="https://alldistrictreads.org/wp-content/uploads/2023/07/All-District-Reads.png"
-            alt="navbar-logo"
-            className="adr-logo"
-          />
-          <h3>Login</h3>
+          <img src={adrLogo} alt="adr-logo" className="adr-logo-login" />
+          <p className="login-heading">Login</p>
           <hr className="separator" />
 
           <input
@@ -98,8 +155,52 @@ function Login() {
             Login
           </button>
           {renderPage()}
+          <div className="forgot-password-container">
+            <p className="forgot-password-button" onClick={handleDialogOpen}>
+              Forgot Password?
+            </p>
+            {resetPasswordMessage && (
+              <p className="reset-password-message">{resetPasswordMessage}</p>
+            )}
+          </div>
         </div>
       </div>
+
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        PaperProps={{
+          component: "form",
+          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            handleForgotPassword();
+          },
+        }}
+      >
+        <DialogTitle>Reset Password</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To reset your password, please enter your email address here. We will send a password reset link to your email.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            id="forgotPasswordEmail"
+            name="email"
+            label="Email Address"
+            type="email"
+            fullWidth
+            variant="standard"
+            value={forgotPasswordEmail}
+            onChange={(e) => setForgotPasswordEmail(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button type="submit">Send Email</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

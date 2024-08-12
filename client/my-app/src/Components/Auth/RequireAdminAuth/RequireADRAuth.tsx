@@ -1,13 +1,13 @@
 import React from "react";
 import { Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from "../AuthProvider";
-import styles from "./RequireAuth.module.css";
+import styles from "./RequireADRAuth.module.css";
 
 interface Props {
   children: JSX.Element;
 }
 
-const RequireAdminAuth: React.FC<Props> = ({ children }) => {
+const RequireADRAuth: React.FC<Props> = ({ children }) => {
   const authContext = useAuth();
   if (authContext.loading) {
     return (
@@ -17,7 +17,7 @@ const RequireAdminAuth: React.FC<Props> = ({ children }) => {
     );
   } else if (!authContext.user) {
     return <Navigate to="/login" state={{ redir: window.location.pathname }} />;
-  } else if (authContext.token?.claims?.role != 'ADRAdmin') {
+  } else if (authContext.token?.claims?.role != 'ADRAdmin' && authContext.token?.claims?.role != 'ADRStaff') {
     return (
       <div className={styles.loadingContainer}>
         <p className={styles.errorMessage}>
@@ -30,4 +30,4 @@ const RequireAdminAuth: React.FC<Props> = ({ children }) => {
   return <AuthProvider>{children}</AuthProvider>;
 };
 
-export default RequireAdminAuth;
+export default RequireADRAuth;

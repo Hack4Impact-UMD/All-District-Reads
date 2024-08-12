@@ -1,104 +1,125 @@
-/* Login.css */
+  .login-outer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background-color: #b3dcfd;
+    background-image: url(create-users_bgd.png);
+    background-size: 125%; 
+    background-position: center;
+  }
 
-.login-outer-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  background-color: #b3dcfd;
-  width: 100vw; /* Full width of the viewport */
-  height: 100vh; /* Full height of the viewport */
-  margin: 0; /* Remove default margin */
-  padding: 0; /* Remove default padding */
-}
+  .login-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    background-color: white;
+    border-radius: 6px;
+    overflow: hidden;
+    width: 60%;
+    height: 80%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
 
-.image-container {
-  background-image: url("https://media.istockphoto.com/id/1354989842/photo/banner-with-books-business-and-education-background-back-to-school-concept.jpg?b=1&s=170667a&w=0&k=20&c=sryJ6CANaeQ7vSw9TG_Z6dFb9wGlTdIHDh5_zxkIT5M=");
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
+  .separator {
+    width: 60%; /* Adjust the width of the separator line */
+    border: 0;
+    border-top: 1px solid #0071ba;
+    margin-bottom: 20px; /* Add some margin below the separator */
+  }
 
-.login-image {
-  width: 300px;
-  height: auto;
-}
+  .login-heading{
+    font-size: large;
+  }
 
-.image-text {
-  margin-top: 20px;
-  color: #666;
-  font-size: 16px;
-  text-align: center;
-}
+  .image-container {
+    background-image: url(login_left_panel.png);
+    background-size: cover; /* Ensure the image covers the container */
+    background-position: center; /* Center the image */
+    flex: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
 
-.login-form-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding-top: 7%;
-  padding-bottom: 7%;
-  width: 60%;
-}
+  .login-form-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    max-width: 100%;;
+  }
 
-.adr-logo {
-  width: 40%;
-  align-items: center;
-}
+  .adr-logo-login {
+    width: 30%;
+  }
 
-h3 {
-  color: #616161;
-}
+  .login-input-field {
+    width: 60%;
+    padding: 2%;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgb(47, 47, 48); /* Add a blue shadow when focused */
+    border-radius: 4px;
+    display: flex;
+    margin-bottom: 15px;
+    font-size: 16px;
+    border: none;
+  }  
+  
+  .login-input-field::placeholder {
+    color: #75b2da;
+  }
 
-.separator {
-  width: 60%; /* Adjust the width of the separator line */
-  border: 0;
-  border-top: 1px solid #0071ba;
-  margin-bottom: 20px; /* Add some margin below the separator */
-}
+  .login-button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
 
-.login-input-field {
-  width: 60%;
-  padding: 2%;
-  font-size: 16px;
-  cursor: pointer;
-  box-shadow: 2px 2px 5px rgb(47, 47, 48); /* Add a blue shadow when focused */
-  border-radius: 4px;
-  display: flex;
-  margin-bottom: 15px;
-  font-size: 16px;
-  border: none;
-}
+  .login-button {
+    width: 40%; /* Ensure the button takes the full width of the container */
+    margin-bottom: 10%;
+    padding: 2%;
+    font-size: 16px;
+    color: white;
+    border: none;
+    background: linear-gradient(
+      90deg,
+      #0071ba,
+      #ffffff
+    ); /* Add gradient background */
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px rgb(47, 47, 48); /* Add a blue shadow when focused */
+    cursor: pointer;
+    transition: background 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .login-button:hover {
+    background: linear-gradient(
+      90deg,
+      #005f9e,
+      #e0e0e0
+    ); /* Darker gradient on hover */
+  }
 
-.login-input-field::placeholder {
-  color: #75b2da;
-}
+  .reset-password-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 0.9em;
+  }
 
-.login-button {
-  width: 40%; /* Ensure the button takes the full width of the container */
-  margin-bottom: 10%;
-  padding: 2%;
-  font-size: 16px;
-  color: white;
-  border: none;
-  background: linear-gradient(
-    90deg,
-    #0071ba,
-    #ffffff
-  ); /* Add gradient background */
-  border-radius: 10px;
-  box-shadow: 2px 2px 5px rgb(47, 47, 48); /* Add a blue shadow when focused */
-  cursor: pointer;
-  transition: background 0.3s ease; /* Smooth transition for hover effect */
-}
-
-.login-button:hover {
-  background: linear-gradient(
-    90deg,
-    #005f9e,
-    #e0e0e0
-  ); /* Darker gradient on hover */
-}
+  .forgot-password-button:hover{
+    cursor: pointer;
+    color: #0071ba;
+  }
