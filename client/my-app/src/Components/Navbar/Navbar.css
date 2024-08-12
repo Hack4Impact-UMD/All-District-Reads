@@ -1,33 +1,33 @@
 /* Navbar.css */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: white; /* Dark blue background */
-    color: black; /* White text color */
-    padding: 10px 20px; /* Padding around the navbar */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white; /* Dark blue background */
+  color: black; /* White text color */
+  padding: 10px 20px; /* Padding around the navbar */
 }
 
 .navbar-logo {
-    width: 100px;
-    height: auto;
+  width: 100px;
+  height: auto;
 }
 
 .navbar-links {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .nav-link {
-    color: black; 
-    text-decoration: none;
-    margin-left: 20px; 
-    font-size: 14px;
-    font-weight: 600;
-    padding: 5px 10px;
+  color: black;
+  text-decoration: none;
+  margin-left: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 5px 10px;
 }
 
 .nav-link:hover {
-    background-color: white; /* Slightly lighter blue on hover */
-    border-radius: 5px; /* Rounded corners for hover effect */
+  background-color: white; /* Slightly lighter blue on hover */
+  border-radius: 5px; /* Rounded corners for hover effect */
 }

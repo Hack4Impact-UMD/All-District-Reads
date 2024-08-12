@@ -1,18 +1,23 @@
 import React from "react";
+import { Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from "../AuthProvider";
 import styles from "./RequireAuth.module.css";
-import { UserType } from "../../../types/types";
 
 interface Props {
-  type: UserType;
   children: JSX.Element;
 }
 
-const RequireAuth: React.FC<Props> = ({ type, children }) => {
+const RequireAdminAuth: React.FC<Props> = ({ children }) => {
   const authContext = useAuth();
   if (authContext.loading) {
-    return <div className={styles.loadingContainer}>Loading...</div>;
-  } else if (authContext.userType !== type) {
+    return (
+      <div className={styles.loadingContainer}>
+        Loading...
+      </div>
+    );
+  } else if (!authContext.user) {
+    return <Navigate to="/login" state={{ redir: window.location.pathname }} />;
+  } else if (authContext.token?.claims?.role != 'SchoolStaff') {
     return (
       <div className={styles.loadingContainer}>
         <p className={styles.errorMessage}>
@@ -21,7 +26,8 @@ const RequireAuth: React.FC<Props> = ({ type, children }) => {
       </div>
     );
   }
+
   return <AuthProvider>{children}</AuthProvider>;
 };
 
-export default RequireAuth;
+export default RequireAdminAuth;

@@ -9,7 +9,6 @@ import { ReadingSchedule } from "../types/types";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../config/firebase";
 
-
 export function authenticateUser(email: string, password: string) {
   return new Promise((resolve, reject) => {
     const auth = getAuth(app);
@@ -37,7 +36,6 @@ export function addReadingSchedule(
       });
   });
 }
-
 
 export function registerUser(email: string, password: string) {
   return new Promise((resolve, reject) => {

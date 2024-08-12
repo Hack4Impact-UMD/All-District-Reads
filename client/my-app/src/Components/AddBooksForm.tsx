@@ -60,7 +60,7 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
   const [numberOfChapters, setNumberOfChapters] = useState(
     chapters.length || 1,
   ); //number of chapters
-  
+
   const [activeChapter, setExactChapter] = useState(0); //which on you're on
   //when you submit, save whatever's in useState to array and database
   const handleSubmit = async (event: React.FormEvent) => {
@@ -71,14 +71,13 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
 
     // Prepare a batch update for chapters to handle them all together
     const batch = writeBatch(db);
-    
 
     // Add book update to the batch and update in array
     batch.update(bookRef, {
       title: title,
       description: description,
       imageUrl: imageUrl,
-      chapters: chapters
+      chapters: chapters,
     });
 
     book.title = title;
@@ -241,14 +240,15 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
     });
   };
 
-
   let activeChapterContent = chapters.find(
     (chapter) => chapter.chapterNumber === activeChapter,
   );
   return (
     <div className="add-books-form">
       <h1>Edit Book</h1>
-      <button onClick={onClose} className="close-button">X</button>
+      <button onClick={onClose} className="close-button">
+        X
+      </button>
 
       <form onSubmit={handleSubmit}>
         <div className="form-section">
@@ -374,7 +374,11 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
             </button>
           </div>
         )}
-        <button type="submit" className="save-button" onClick={handleAddBookClick}>
+        <button
+          type="submit"
+          className="save-button"
+          onClick={handleAddBookClick}
+        >
           Publish
         </button>
       </form>

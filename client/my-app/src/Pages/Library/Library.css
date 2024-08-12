@@ -1,13 +1,12 @@
-h1{
-  font-family: 'Times New Roman', Times, serif;
+h1 {
+  font-family: "Times New Roman", Times, serif;
   color: white;
 }
 
-h2{
+h2 {
   font-weight: 30px;
   font-size: 20px;
 }
-
 
 .modal {
   display: none;
@@ -67,7 +66,7 @@ h2{
 .library-container {
   grid-template-columns: repeat(auto-fill, minmax(300px, 10fr));
   max-height: auto;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: "Times New Roman", Times, serif;
   background-color: black;
 }
 
@@ -166,7 +165,7 @@ h2{
   margin-left: 130px;
   border-radius: 4px;
   background-color: #013e67;
-  
+
   color: white;
   width: 300px;
   height: 20px;
@@ -235,7 +234,6 @@ h2{
   display: block;
 }
 
-
 .view-buttons {
   display: flex;
   align-items: center;
@@ -247,18 +245,20 @@ h2{
   /* This will push the buttons to the end of the search bar */
 }
 
-.view-button{
+.view-button {
   height: 30px;
   font-size: 12px;
 }
 
-.buttons{
+.buttons {
+  position: absolute;
+  right: 0;
   display: flex;
   align-items: center;
   gap: 7px;
 }
 
-.icon{
+.icon {
   color: black;
 }
 
@@ -277,7 +277,7 @@ h2{
   background-color: #ccc;
 }
 
-.book-details{
+.book-details {
   color: white;
 }
 

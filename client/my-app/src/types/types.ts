@@ -2,7 +2,7 @@ export enum UserType {
   ADRAdmin = "ADRAdmin",
   Parent = "Parent",
   ADRStaff = "ADRStaff",
-  SchoolStaff = "SchoolStaff"
+  SchoolStaff = "SchoolStaff",
 }
 export type ReadingSchedule = {
   scheduleId: string;
@@ -14,10 +14,17 @@ export type ReadingSchedule = {
   chapterIds: string[];
 };
 
-export const canCreateUserType = (currentUserType: UserType, newUserType: UserType): boolean => {
+export const canCreateUserType = (
+  currentUserType: UserType,
+  newUserType: UserType,
+): boolean => {
   switch (currentUserType) {
     case UserType.ADRAdmin:
-      return [UserType.ADRAdmin, UserType.ADRStaff, UserType.SchoolStaff].includes(newUserType);
+      return [
+        UserType.ADRAdmin,
+        UserType.ADRStaff,
+        UserType.SchoolStaff,
+      ].includes(newUserType);
     case UserType.ADRStaff:
       return newUserType === UserType.SchoolStaff; // ADR Staff can only create SchoolStaff accounts.
     default:

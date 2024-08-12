@@ -1,5 +1,11 @@
-.page {
-  overflow: auto;
+h1 {
+  color: white;
+}
+
+h3{
+  margin-left: 1%;
+  font-weight: 250;
+  color: #0071ba;
 }
 
 .pageTop {
@@ -7,8 +13,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  background-color: gray;
+  background-color: #0071ba;
+}
+
+.schoolDistrictId{
+  color: black;
+  font-weight: 500;
 }
 
 .pageTitle {
@@ -17,131 +27,68 @@
   font-weight: 600;
 }
 
+.assignment {
+  background-color: #0071ba;
+  border-radius: 7px;
+  color: white;
+  display: flex;
+  gap: 100px;
+  align-items: center;
+  padding-left: 5px;
+  justify-content: space-between;
+}
+
 .button {
-  background-color: #e6e6e6;
-  color: #636363;
-  font-weight: bold;
-}
-
-.select {
-  width: 300px;
-  background-color: #e6e6e6;
-  font-weight: bold;
-  text-align: left;
-}
-
-.newChapterContainer {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  margin: 10%;
-}
-
-.title {
-  font-size: 30px;
-  color: #757575;
-  font-weight: 600;
-  padding-bottom: 20px;
-}
-
-.inputContainer {
-  display: flex;
-  flex-direction: row;
-  gap: 40px;
-}
-
-.leftQuestionContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.rightQuestionContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 100%;
-  padding-top: 40px;
-}
-
-.inputBox {
-  background-color: #e6e6e6;
-  font-weight: bold;
-}
-
-.subtitle {
-  color: rgba(0, 0, 0, 0.33);
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.datePicker {
-  width: 230px;
-  height: 50px;
-  border-radius: 10px;
+  background-color: #0071ba;
+  color: white;
   border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
-.chapterQuestionDatabase {
-  text-align: left;
-  margin: 10%;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding-bottom: 20px;
+
+
+.icon-button {
+  background: none;
+  font-size: 20px;
 }
 
-.selectBookContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  width: 30%; /* Adjust this value to control the width of the container */
+.icon {
+  color: white;
 }
 
-.selectedReadingPeriodConatiner{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  width: 20%;
+.save-book {
+  display: block;
+  margin-top: 20px;
 }
 
-.questionsHeader {
-  display: flex;
-  justify-content: space-between;
+.edit,
+.delete {
+  background: none;
 }
 
-.questionsContainer {
-  max-height: 300px;
-  width: 100%;
-  background-color: #e6e6e6;
-  border-radius: 10px;
-  align-items: center;
-  overflow: auto;
-  padding-left: 10px;
-  padding-top: 10px;
-  padding-right: 10px;
+.assignmentTitleCell {
+  position: relative;
 }
 
-.question {
+.assignmentTitleBox {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: white;
-  border-radius: 10px;
-  padding-left: 10px;
-  margin-bottom: 10px;
 }
 
-.save-chapter {
-  background-color: #636363;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.iconContainer {
+  display: none;
+  margin-left: 10px;
 }
 
-.saveButtonContainer {
+.assignmentTitleCell:hover .iconContainer {
   display: flex;
-  justify-content: center;
 }
+

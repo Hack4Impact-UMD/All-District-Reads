@@ -1,273 +1,377 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { db } from "../../config/firebase";
 import {
-  collection,
   getDocs,
+  collection,
   doc,
-  setDoc
+  getDoc,
+  deleteDoc, 
+  query,
+  where // Import query and where functions
 } from "firebase/firestore";
-import { FormControl, InputLabel, Select, MenuItem, Button, Checkbox, TextField } from '@mui/material';
-import ReadingScheduleBottom from './ReadingScheduleBottom';
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Table from '@mui/material/Table';
+import TableHead from '@mui/material/TableHead';
+import TableBody from '@mui/material/TableBody';
+import TableCell , { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableFooter from '@mui/material/TableFooter';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import { styled } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
 import styles from "./ReadingSchedule.module.css";
-import { Dayjs } from "dayjs";
+import { useParams } from "react-router-dom";
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { useNavigate } from "react-router-dom";
+import Button from '@mui/material/Button';
 
-type Chapter = {
-  chapterId: string;
-  chapterNumber: number;
-  questions: string[];
-  answers: string[];
-};
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "grey",
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
 
-type Book = {
+interface TablePaginationActionsProps {
+  count: number;
+  page: number;
+  rowsPerPage: number;
+  onPageChange: (
+    event: React.MouseEvent<HTMLButtonElement>,
+    newPage: number,
+  ) => void;
+}
+
+interface ReadingAssignment {
   id: string;
   title: string;
-  description?: string;
-  chapters?: Chapter[];
-  imageUrl?: string;
-};
+  bookId: string;
+  bookTitle?: string;
+  readingPeriod: string;
+  dueDate: string;
+}
 
-const ReadingSchedule = () => {
-  const [books, setBooks] = useState<Book[]>([]);
-  const [selectedBook, setSelectedBook] = useState<string>('');
-  const [selectedReadingPeriod, setSelectedReadingPeriod] = useState<string>('');
-  const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [selectedChapter, setSelectedChapter] = useState<string>('');
-  const [questions, setQuestions] = useState<string[]>([]);
-  const [date, setDate] = useState<Dayjs | null>(null);
-  const [chapterAssignmentTitle, setChapterAssignmentTitle] = useState("");
-  const [assignmentDescription, setAssignmentDescription] = useState("");
-  const [url, setUrl] = useState("");
+function TablePaginationActions(props: TablePaginationActionsProps) {
+  const theme = useTheme();
+  const { count, page, rowsPerPage, onPageChange } = props;
 
-  // Fetch all books
-  useEffect(() => {
-    const fetchBooks = async () => {
-      const querySnapshot = await getDocs(collection(db, "books"));
-      const booksData: Book[] = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        title: doc.data().title || "No Title",
-        description: doc.data().description || "",
-        imageUrl: doc.data().imageUrl || "",
-        chapters: doc.data().chapters || [],
-      }));
-      setBooks(booksData);
-    };
+  const handleFirstPageButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    onPageChange(event, 0);
+  };
 
-    fetchBooks();
-  }, []);
+  const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onPageChange(event, page - 1);
+  };
 
-  // Fetch chapters when a book is selected
-  useEffect(() => {
-    if (!selectedBook) return;
+  const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onPageChange(event, page + 1);
+  };
 
-    const fetchChapters = async () => {
-      const chaptersRef = collection(db, "books", selectedBook, "Chapters");
-      const snapshot = await getDocs(chaptersRef);
-      const chaptersData: Chapter[] = snapshot.docs.map(doc => ({
-        chapterId: doc.id,
-        chapterNumber: doc.data().chapterNumber, // Make sure your data model matches this
-        questions: doc.data().questions || [],
-        answers: doc.data().answers || []  // Assuming questions are stored directly
-      }));
-      setChapters(chaptersData);
-    };
-
-    fetchChapters();
-  }, [selectedBook]);
-
-  // Fetch questions when a chapter is selected
-  useEffect(() => {
-    if (!selectedChapter) return;
-
-    const selectedChapterData = chapters.find(chap => chap.chapterId === selectedChapter);
-    if (selectedChapterData) {
-      setQuestions(selectedChapterData.questions);
-    }
-  }, [selectedChapter, chapters]);
-
-  const handleSaveChapter = async () => {
-    if (!selectedBook || !selectedChapter || !date || chapterAssignmentTitle.trim() === '' || assignmentDescription.trim() === '') {
-      alert('Please fill all fields before saving.');
-      return;
-    }
-
-    const newReadingSchedule = {
-      bookId: selectedBook,
-      chapterIds: selectedChapter, 
-      createdBy: "1", // This should be dynamically set based on the user (e.g., from auth)
-      readingPeriod: selectedReadingPeriod,
-      dueDates: [date?.format("MM/DD")], // Formatting the date to match your Firestore format
-      schoolDistrictId: "District 1" // This should be dynamically set based on user or configuration
-    };
-
-    try {
-      const docRef = doc(collection(db, "readingSchedules"));
-      await setDoc(docRef, newReadingSchedule);
-      alert('Reading schedule saved successfully!');
-    } catch (error) {
-      console.error("Error writing document: ", error);
-      alert('Failed to save reading schedule.');
-    }
-  }
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const input = e.target.value;
-    const regex = /^(Spring|Fall|Summer|Winter)\s*(\d{4,})$/i;
-    const match = input.match(regex);
-
-    if (match) {
-        const season = match[1].toLowerCase();
-        const year = parseInt(match[2], 10);
-
-        if (year >= 2024) {
-            setSelectedReadingPeriod(`${season} ${year}`);
-        } else {
-            alert('The year must be greater than 2024.');
-        }
-    } else {
-        alert('Invalid input. The format should be "<Season> <Year>". Season should be one of the following - Spring, Summer, Fall, Winter');
-    }
-};
+  const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+  };
 
   return (
-    <div className={styles.page}>
+    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+      <IconButton
+        onClick={handleFirstPageButtonClick}
+        disabled={page === 0}
+        aria-label="first page"
+      >
+        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+      </IconButton>
+      <IconButton
+        onClick={handleBackButtonClick}
+        disabled={page === 0}
+        aria-label="previous page"
+      >
+        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+      </IconButton>
+      <IconButton
+        onClick={handleNextButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="next page"
+      >
+        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+      </IconButton>
+      <IconButton
+        onClick={handleLastPageButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="last page"
+      >
+        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+      </IconButton>
+    </Box>
+  );
+}
+
+export default function ReadingScheduleBottom() {
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rows, setRows] = React.useState<ReadingAssignment[]>([]);
+  const [filteredRows, setFilteredRows] = React.useState<ReadingAssignment[]>([]);
+
+  const [filterBookTitle, setFilterBookTitle] = useState("");
+  const [filterDueDate, setFilterDueDate] = useState("");
+  const [filterReadingPeriod, setFilterReadingPeriod] = useState("");
+  const { schoolDistrictId } = useParams();
+  const navigate = useNavigate(); 
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      if (schoolDistrictId) {
+        // Create a query to filter documents by schoolDistrictId
+        const q = query(collection(db, "readingSchedules"), where("schoolDistrictId", "==", schoolDistrictId));
+        const querySnapshot = await getDocs(q);
+        const rowsData = await Promise.all(querySnapshot.docs.map(async (docSnapshot) => {
+          const bookId = docSnapshot.data().bookId;
+          const bookDocRef = doc(db, "books", bookId); 
+          const bookDoc = await getDoc(bookDocRef);
+
+          const bookData = bookDoc.data() as { title: string } | undefined;
+          const bookTitle = bookData ? bookData.title : "Unknown Title";
+
+          return {
+            id: docSnapshot.id,
+            title: docSnapshot.data().title,
+            bookId,
+            bookTitle,
+            readingPeriod: docSnapshot.data().readingPeriod,
+            dueDate: docSnapshot.data().dueDate,
+          };
+        }));
+        setRows(rowsData);
+      }
+    };
+  
+    fetchData();
+  }, [schoolDistrictId]);
+
+  // Apply filters
+  useEffect(() => {
+    let filteredData = rows;
+
+    if (filterBookTitle) {
+      filteredData = filteredData.filter(row =>
+        row.bookTitle?.toLowerCase().includes(filterBookTitle.toLowerCase())
+      );
+    }
+
+    if (filterDueDate) {
+      filteredData = filteredData.filter(row =>
+        row.dueDate.includes(filterDueDate)
+      );
+    }
+
+    if (filterReadingPeriod) {
+      filteredData = filteredData.filter(row =>
+        row.readingPeriod.toLowerCase().includes(filterReadingPeriod.toLowerCase())
+      );
+    }
+
+    setFilteredRows(filteredData);
+  }, [rows, filterBookTitle, filterDueDate, filterReadingPeriod]);
+
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredRows.length) : 0;
+
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number,
+  ) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "readingSchedules", id));
+      setRows(prevRows => prevRows.filter(row => row.id !== id));
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
+  };
+
+  const handleEdit = (id: string) => {
+    if (schoolDistrictId) {
+      navigate(`/schedule/schoolDistrict/${schoolDistrictId}/assignment/${id}`);
+    }
+  };
+
+  return (
+    <Box>
       <div className={styles.pageTop}>
-        <h1 className={styles.pageTitle}>New Book Assignment</h1>
-        <div className={styles.selectBookContainer}>
-          <FormControl fullWidth sx={{ 
-            gap: '10px',
-            justifyContent: 'center',
-            display: 'flex',
-            flexDirection: 'colum'
-            }}>
-            <InputLabel>Select Book</InputLabel>
-            <Select
-              value={selectedBook}
-              label="Select Book"
-              onChange={(e => setSelectedBook(e.target.value))}
-              sx={{
-                backgroundColor: '#0071ba', // Change the background color to blue
-                color: 'white', // Change text color to white
-                height: 50, // Adjust height
-                '& .MuiInputBase-input': {
-                  color: 'white', // Change the text color to white
-                },
-                '& .MuiSelect-icon': {
-                  color: 'white', // Change the icon color to white
-                }
-              }}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {books.map(book => (
-                <MenuItem key={book.id} value={book.id}>
-                  {book.title}
-                </MenuItem>
-              ))}
-            </Select>
-            <TextField
-                value={selectedReadingPeriod}
-                label="Select Reading Period"
-                onBlur={handleBlur}
-                onChange={(e => setSelectedReadingPeriod(e.target.value))}
-                sx={{
-                  backgroundColor: '#0071ba', // Change the background color to blue
-                  '& .MuiInputBase-input': {
-                    color: 'white', // Change the text color to white
+        <h1 className={styles.pageTitle}>Reading Schedule</h1>
+        {schoolDistrictId && (
+          <p className={styles.schoolDistrictId}>School District ID: {schoolDistrictId}</p>
+        )}
+        <Button
+          variant="outlined"
+          size="medium"
+          sx={{
+            backgroundColor: 'white',
+            color: '#0071ba', 
+            borderColor: '#0071ba', 
+            '&:hover': {
+              backgroundColor: '#f5f5f5', 
+              borderColor: '#0071ba', 
+            },
+          }}
+          onClick={() => navigate(`/schedule/add`)}
+        >
+          Add New Assignment
+        </Button>
+      </div>
+      
+      <h3 className="filters-title">Filters</h3>
+      <Box sx={{ display: 'flex', justifyContent: 'left', marginBottom: 1, marginTop: 1}}>
+        <TextField
+          label="Filter by Book"
+          variant="outlined"
+          value={filterBookTitle}
+          onChange={(e) => setFilterBookTitle(e.target.value)}
+          style={{ marginRight: '0.4%', marginLeft: '1%' }}
+            size="small" 
+            InputProps={{
+              sx: {
+                height: '30px', 
+              },
+            }}
+            InputLabelProps={{
+              sx: {
+                fontSize: '0.8rem', 
+              },
+            }}
+        />
+        <TextField
+          label="Filter by Due Date"
+          variant="outlined"
+          value={filterDueDate}
+          onChange={(e) => setFilterDueDate(e.target.value)}
+          style={{ marginRight: '0.4%'}}
+            size="small" 
+            InputProps={{
+              sx: {
+                height: '30px', 
+              },
+            }}
+            InputLabelProps={{
+              sx: {
+                fontSize: '0.8rem', 
+              },
+            }}
+        />
+        <TextField
+          label="Filter by Reading Period"
+          variant="outlined"
+          value={filterReadingPeriod}
+          onChange={(e) => setFilterReadingPeriod(e.target.value)}
+          style={{ marginRight: '0.4%'}}
+            size="small" 
+            InputProps={{
+              sx: {
+                height: '30px', 
+              },
+            }}
+            InputLabelProps={{
+              sx: {
+                fontSize: '0.8rem', 
+              },
+            }}
+        />
+      </Box>
+
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell>Assignment Title</StyledTableCell>
+              <StyledTableCell align="right">Book</StyledTableCell>
+              <StyledTableCell align="right">Reading Period</StyledTableCell>
+              <StyledTableCell align="right">Due Date</StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {(rowsPerPage > 0
+              ? filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : filteredRows
+            ).map((row) => (
+              <TableRow key={row.id}>
+                <TableCell component="th" scope="row" className={styles.assignmentTitleCell}>
+                  <Box className={styles.assignmentTitleBox}>
+                    {row.title}
+                    <Box className={styles.iconContainer}>
+                      <IconButton size="small" onClick={() => handleEdit(row.id)}>
+                        <EditOutlinedIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => handleDelete(row.id)}>
+                        <DeleteOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="right">
+                  {row.bookTitle}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="right">
+                  {row.readingPeriod}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="right">
+                  {row.dueDate}
+                </TableCell>
+              </TableRow>
+            ))}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={6} />
+              </TableRow>
+            )}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                colSpan={3}
+                count={filteredRows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                slotProps={{
+                  select: {
+                    inputProps: {
+                      'aria-label': 'rows per page',
+                    },
+                    native: true,
                   },
                 }}
-            />
-          </FormControl>
-        </div>
-      </div>
-      <div className={styles.newChapterContainer}>
-        <div className={styles.title}>New Chapter Assignment</div>
-        <div className={styles.inputContainer}>
-          <div className={styles.leftQuestionContainer}>
-            <div className={styles.subtitle}>Assigned Chapter</div>
-            <FormControl className={styles.select}>
-              <InputLabel>Select Chapter</InputLabel>
-              <Select
-                value={selectedChapter}
-                label="Select Chapter"
-                onChange={(e => setSelectedChapter(e.target.value))}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {chapters.map(chap => (
-                  <MenuItem key={chap.chapterId} value={chap.chapterId}>
-                    {`Chapter ${chap.chapterNumber}`}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <div className={styles.subtitle}>Chapter Due Date</div>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
-                <DatePicker
-                  label="Due Date"
-                  value={date}
-                  onChange={setDate}
-                />
-              </DemoContainer>
-            </LocalizationProvider>
-          </div>
-
-          <div className={styles.rightQuestionContainer}>
-            <TextField
-              className={styles.inputBox}
-              fullWidth
-              placeholder="Chapter Assignment Title"
-              value={chapterAssignmentTitle}
-              onChange={(e) => setChapterAssignmentTitle(e.target.value)}
-            />
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              className={styles.inputBox}
-              placeholder="Assignment Description"
-              value={assignmentDescription}
-              onChange={(e) => setAssignmentDescription(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-      <div className={styles.chapterQuestionDatabase}>
-        <div className={styles.title}>Chapter Questions Database</div>
-        <div className={styles.questionsHeader}>
-          <div className={styles.subtitle}>Selected Questions</div>
-          <Button className={styles.button}>Clear All</Button>
-        </div>
-        <div className={styles.questionsContainer}>
-          {questions.map((question, index) => (
-            <div key={index} className={styles.question}>
-              {question}
-              <Checkbox />
-            </div>
-          ))}
-        </div>
-        <div className={styles.subtitle}>Read-Aloud Video URL</div>
-        <TextField
-          fullWidth
-          className={styles.inputBox}
-          placeholder="URL"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        />
-      </div>
-      <div className={styles.saveButtonContainer}>
-        <button className="save-chapter" onClick={handleSaveChapter}>Save Chapter</button>
-      </div>
-
-      <ReadingScheduleBottom />
-    </div>
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
+    </Box>
   );
-};
-
-export default ReadingSchedule;
+}

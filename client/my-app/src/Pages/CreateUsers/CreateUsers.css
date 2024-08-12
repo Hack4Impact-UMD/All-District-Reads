@@ -1,116 +1,120 @@
-/* Login.css */
+/* The light blue background of the page */
+.user-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: #b3dcfd;
+  background-image: url(create-users_bgd.png);
+  background-size: 125%; 
+  background-position: center;
+}
 
-/* Login.css */
+/* user options */
+.userOptions {
+  display: flex;
+  align-self: center;
+  margin-bottom: 4%;
+}
 
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    position: relative; /* Ensure the container can properly contain the pseudo-element */
-    overflow: hidden; /* Prevent any overflow from the pseudo-element */
-    background-color: #b3dcfd;
-  }
-  
-  .container::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: bottom;
-    background-repeat: no-repeat;
-    opacity: 0.5; /* Adjust this value to control the opacity of the background */
-    z-index: -1; /* Places the pseudo-element behind the content of the container */
-  }
+.userOption {
+  text-align: center;
+  cursor: pointer;
+}
 
-  .userOptions{
-    margin-bottom: 10px;
-  }
-  
-  .login-container {
-    display: flex;
-    flex-direction: row;
-    
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
-    max-width: 800px;
-    z-index: 1; /* Ensure the login container is above the pseudo-background */
-  }
-  
-  
-  
-  .image-container {
-    background-image: url("https://media.istockphoto.com/id/1354989842/photo/banner-with-books-business-and-education-background-back-to-school-concept.jpg?b=1&s=170667a&w=0&k=20&c=sryJ6CANaeQ7vSw9TG_Z6dFb9wGlTdIHDh5_zxkIT5M=");
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .login-image {
-    width: 300px;
-    height: auto;
-  }
-  
-  .image-text {
-    margin-top: 20px;
-    color: #666;
-    font-size: 16px;
-    text-align: center;
-  }
-  
-  .form-container {
-    padding: 40px;
-    padding-top: 100px;
-    padding-bottom: 100px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-color: white;
-  }
-  
-  .form-container h2 {
-    align-self: center;
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-  }
-  
-  .form-container input {
-    margin-bottom: 15px;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 100%;
-  }
-  
-  .form-container button {
-    margin-bottom: 15px;
-    padding: 10px;
-    font-size: 16px;
-    color: white;
-    background-color: #0071ba;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .form-container button.google-login {
-    background-color: #db4437;
-  }
-  
-  .form-container a {
-    color: #5a67d8;
-    text-decoration: none;
-  }
-  
-  .form-container a:hover {
-    text-decoration: underline;
-  }
-  
+.userOption input {
+  display: none;
+}
+
+.userOption input:checked + span {
+  background-color: #0071ba;
+  color: white;
+}
+
+.userOption span {
+  display: block;
+  padding: 10px 20px;
+  border: 1px solid #000;
+}
+
+.heading-text {
+  align-self: center;
+  margin-bottom: 1%;
+}
+
+/* white background container */
+.user-form-container {
+  margin-top: 5%;
+  padding-bottom: 5%;
+  margin-bottom: 5%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: white;
+  border-radius: 6px;
+}
+
+/* The "Create New User" Title */
+.user-form-container h2 {
+  align-self: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+/* email and password input fields */
+.user-form-container input {
+  align-self: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 50%;
+}
+
+.user-input-field {
+  width: 60%;
+  padding: 2%;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 2px 2px 5px rgb(47, 47, 48); /* Add a blue shadow when focused */
+  border-radius: 4px;
+  display: flex;
+  margin-bottom: 15px;
+  font-size: 16px;
+  border: none;
+}
+
+/* The create user submit button at bottom */
+.user-form-container button {
+  align-self: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  font-size: 16px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 50%;
+
+  color: white;
+  border: none;
+  background: linear-gradient(
+    90deg,
+    #0071ba,
+    #ffffff
+  ); /* Add gradient background */
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgb(47, 47, 48); /* Add a blue shadow when focused */
+  cursor: pointer;
+  transition: background 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.adr-logo {
+  margin-top: 5%;
+  align-self: center;
+  width: 20%;
+  height: auto;
+}

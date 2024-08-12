@@ -1,10 +1,9 @@
 // CreateUsers.tsx
-import { UserType, canCreateUserType } from '../../types/types';
-import './CreateUsers.css';
-import React, { useState } from "react";
+import { UserType, canCreateUserType } from "../../types/types";
+import "./CreateUsers.css";
+import React, { useState, useEffect } from "react";
 import {
   getAuth,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import {
@@ -14,9 +13,14 @@ import {
   getApp,
 } from "firebase/app";
 import firebaseConfig from "../../config/firebase"; // Make sure to provide the correct path to your Firebase config
-import { createAdminUser, createADRStaffUser, createSchoolStaffUser} from "../../backend/cloudFunctionCalls";
+import {
+  createAdminUser,
+  createADRStaffUser,
+  createSchoolStaffUser,
+} from "../../backend/cloudFunctionCalls";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "../../Components/Auth/AuthProvider";
+import Alert from '@mui/material/Alert';
 
 // Initialize Firebase app
 let firebaseApp: FirebaseApp;
@@ -26,14 +30,27 @@ try {
   firebaseApp = getApp(); // If the app is already initialized, get the existing app
 }
 
-interface Props {
-  currentUserType: UserType;
-}
+const CreateUsers: React.FC = () =>{
+  const authContext = useAuth();
+  const [currentUserType, setCurrentUserType] = useState<UserType | null>(null);
+  const [availableUserTypes, setAvailableUserTypes] = useState<UserType[]|undefined>();
+  
+  useEffect(() => {
+    if (!authContext.loading) {
+      const role = authContext.token?.claims.role as UserType;
+      setCurrentUserType(role);
+    }
+  }, [authContext.loading, authContext.token?.claims.role]);
 
-const CreateUsers: React.FC<Props> = ({ currentUserType }) => {
+  useEffect(() => {
+    if (currentUserType) {
+      const types = getAvailableUserTypes(currentUserType);
+      setAvailableUserTypes(types);
+    }
+  }, [currentUserType]);
 
-  const getAvailableUserTypes = () => {
-    switch (currentUserType) {
+  const getAvailableUserTypes = (role: UserType): UserType[] => {
+    switch (role) {
       case UserType.ADRAdmin:
         return [UserType.ADRAdmin, UserType.ADRStaff, UserType.SchoolStaff];
       case UserType.ADRStaff:
@@ -43,17 +60,26 @@ const CreateUsers: React.FC<Props> = ({ currentUserType }) => {
     }
   };
 
-  const [availableUserTypes, setAvailableUserTypes] = useState<UserType[]>(getAvailableUserTypes());
+  const getDisplayName = (type: UserType): string => {
+    switch (type) {
+      case UserType.ADRAdmin:
+        return "ADRA Admin";
+      case UserType.ADRStaff:
+        return "ADR Staff";
+      case UserType.SchoolStaff:
+        return "School Staff";
+      default:
+        return "";
+    }
+  };
+   
   const [newUserType, setNewUserType] = useState<UserType>();
-  const [message, setMessage] = useState('');
   const [registrationEmail, setRegistrationEmail] = useState("");
   const [registrationPassword, setRegistrationPassword] = useState("");
-  const [registrationButtonClicked, setRegistrationButtonClicked] =
-    useState(false); // State to track if registration button is clicked
   const [registrationError, setRegistrationError] = useState(""); // State to store registration error message
+  const [registrationSuccess, setRegistrationSuccess] = useState(false); // State to track registration success
   const [currentPage, setCurrentPage] = useState<"home" | "wrong" | null>(null); // State to track current page
   const navigate = useNavigate();
-
 
   const handleRegister = async () => {
     const auth = getAuth(firebaseApp);
@@ -62,76 +88,81 @@ const CreateUsers: React.FC<Props> = ({ currentUserType }) => {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         registrationEmail,
-        registrationPassword,
+        registrationPassword
       );
-      if (newUserType == UserType.ADRAdmin){
-        await createAdminUser(registrationEmail);
+
+      const userId = userCredential.user.uid;
+
+      if (newUserType === UserType.ADRAdmin) {
+        await createAdminUser(userId, registrationEmail);
+      } else if (newUserType === UserType.ADRStaff) {
+        await createADRStaffUser(userId, registrationEmail);
+      } else if (newUserType === UserType.SchoolStaff) {
+        await createSchoolStaffUser(userId, registrationEmail);
       }
 
-      if (newUserType == UserType.ADRStaff){
-        await createADRStaffUser(registrationEmail);
-      }
-
-      if (newUserType == UserType.SchoolStaff){
-        await createSchoolStaffUser(registrationEmail);
-      }
-      console.log("Registration successful:", userCredential.user);
-      setRegistrationButtonClicked(true); // Set registrationButtonClicked to true when registration button is clicked
+      setRegistrationSuccess(true);
       setRegistrationError("");
-      setRegistrationEmail(""); // Clear email input
-      setRegistrationPassword(""); // Clear password input
-      // Optionally, you can redirect to another page after successful registration
+      setRegistrationEmail(""); 
+      setRegistrationPassword(""); 
     } catch (error: any) {
       console.error("Registration error:", error.message);
       setRegistrationError("Registration error: " + error.message);
-    }
-  };
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case "home":
-        return <div>Registeration Success!</div>;
-      case "wrong":
-        return <div>Registeration not successful</div>;
-      default:
-        return null;
+      setRegistrationSuccess(false);
     }
   };
 
   return (
-    <div className="container">
-      <div className="form-container">
+    <div className="user-container">
+      <div className="user-form-container">
+        {registrationSuccess && (
+          <Alert severity="success">User Successfully Created!</Alert>
+        )}
+        {registrationError && (
+          <Alert severity="error">{registrationError}</Alert>
+        )}
+        <img
+          src="https://alldistrictreads.org/wp-content/uploads/2023/07/All-District-Reads.png"
+          alt="navbar-logo"
+          className="adr-logo"
+        />
         <h2>Create New User</h2>
+        <div className="heading-text">Select new user type</div>
 
-        <select className = "userOptions" value={newUserType} onChange={(e) => setNewUserType(e.target.value as UserType)}>
-        {availableUserTypes.map(type => (
-            <option key={type} value={type}>{type}</option>
+        <div className="userOptions">
+          {availableUserTypes?.map((type) => (
+            <label key={type} className="userOption">
+              <input
+                type="radio"
+                name="userType"
+                value={type}
+                checked={newUserType === type}
+                onChange={(e) => setNewUserType(e.target.value as UserType)}
+              />
+              <span>{getDisplayName(type)}</span>
+            </label>
           ))}
-        </select>
+        </div>
 
         <input
-            type="email"
-            placeholder="Username or Email"
-            value={registrationEmail}
-            onChange={(e) => setRegistrationEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={registrationPassword}
-            onChange={(e) => setRegistrationPassword(e.target.value)}
-          />
-          <button onClick={handleRegister}>Create User</button>
-          {registrationError && <p>{registrationError}</p>}
-          {registrationButtonClicked && <p>Register button clicked!</p>}
-          {renderPage()}
+          type="email"
+          placeholder="Username or Email"
+          value={registrationEmail}
+          onChange={(e) => setRegistrationEmail(e.target.value)}
+          className="user-input-field"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={registrationPassword}
+          onChange={(e) => setRegistrationPassword(e.target.value)}
+          className="user-input-field"
+        />
+        <button onClick={handleRegister}>Create User</button>
         
-        <p>{message}</p>
       </div>
     </div>
   );
 };
 
 export default CreateUsers;
-
-
