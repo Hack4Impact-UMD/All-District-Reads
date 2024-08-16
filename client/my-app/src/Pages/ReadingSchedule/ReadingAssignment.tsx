@@ -262,7 +262,7 @@ const ReadingSchedule = () => {
             </Select>
             <TextField
               value={selectedReadingPeriod}
-              label="Select Reading Period"
+              label="Select Reading Period (Enter: <Season> <Year>)"
               onBlur={handleBlur}
               onChange={(e) => setSelectedReadingPeriod(e.target.value)}
               sx={{
