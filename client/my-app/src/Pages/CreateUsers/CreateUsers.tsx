@@ -22,6 +22,19 @@ import { useAuth } from "../../Components/Auth/AuthProvider";
 import Alert from '@mui/material/Alert';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import {
+  getDocs,
+  collection,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  setDoc,
+  doc,
+  getDoc,
+  writeBatch,
+} from "firebase/firestore";
+import { db } from "../../config/firebase";
+
 
 // Initialize Firebase app
 let firebaseApp: FirebaseApp;
@@ -145,6 +158,13 @@ const CreateUsers: React.FC = () => {
         await createADRStaffUser(userId, registrationEmail, newUserName);
       } else if (newUserType === UserType.SchoolStaff) {
         await createSchoolStaffUser(userId, registrationEmail, newUserName, schoolDistrictId);
+
+        const schoolDistrictRef = doc(db, "schoolDistrictIds", schoolDistrictId);
+        const schoolDistrictDoc = await getDoc(schoolDistrictRef);
+
+        if (!schoolDistrictDoc.exists()) {
+          await setDoc(schoolDistrictRef, { schoolDistrictId });
+        }
       }
 
       setRegistrationSuccess(true);

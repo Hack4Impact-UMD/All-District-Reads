@@ -238,7 +238,7 @@ export default function ReadingScheduleBottom() {
               borderColor: '#0071ba', 
             },
           }}
-          onClick={() => navigate(`/schedule/add`)}
+          onClick={() => navigate(`/schedule/${schoolDistrictId}/add`)}
         >
           Add New Assignment
         </Button>
