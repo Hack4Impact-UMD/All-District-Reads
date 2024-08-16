@@ -15,7 +15,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import styles from "./ReadingAssignment.module.css";
 import dayjs, { Dayjs } from 'dayjs';
-import { useParams } from "react-router-dom"; // Import useParams
+import { useParams, useNavigate } from "react-router-dom"; // Import useParams
 
 type Chapter = {
   chapterId: string;
@@ -47,6 +47,10 @@ const ReadingSchedule = () => {
   const [chapterAssignmentTitle, setChapterAssignmentTitle] = useState("");
   const [assignmentDescription, setAssignmentDescription] = useState("");
   const [url, setUrl] = useState("");
+  const [allSelected, setAllSelected] = useState<boolean>(false); // New state
+  const navigate = useNavigate(); 
+
+
 
   const { schoolDistrictId, assignmentId } = useParams(); // Get the parameters from the URL
 
@@ -152,11 +156,32 @@ const ReadingSchedule = () => {
       const docRef = doc(db, "readingSchedules", assignmentId || doc(collection(db, "readingSchedules")).id);
       await setDoc(docRef, newReadingSchedule);
       alert("Reading schedule saved successfully!");
+      navigate(`/schedule/schoolDistrict/${schoolDistrictId}`)
     } catch (error) {
       console.error("Error writing document: ", error);
       alert("Failed to save reading schedule.");
     }
   };
+
+  const handleClearAllOrSelectAll = () => {
+    if (allSelected) {
+      // Clear all questions
+      setSelectedQuestions([]);
+      setSelectedAnswers([]);
+    } else {
+      // Select all questions and their corresponding answers
+      const allQuestions = questions;
+      const allAnswers = chapters
+        .find((chap) => chap.chapterId === selectedChapter)?.answers || [];
+  
+      setSelectedQuestions(allQuestions);
+      setSelectedAnswers(allAnswers);
+    }
+  
+    // Toggle the allSelected state
+    setAllSelected(!allSelected);
+  };
+  
 
   const handleBlur = (
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -319,7 +344,10 @@ const ReadingSchedule = () => {
         <div className={styles.title}>Chapter Questions Database</div>
         <div className={styles.questionsHeader}>
           <div className={styles.subtitle}>Selected Questions</div>
-          <Button className={styles.button}>Clear All</Button>
+          <Button onClick={handleClearAllOrSelectAll} className={styles.button}>
+            {allSelected ? "Clear All" : "Select All"}
+          </Button>
+
         </div>
         <div className={styles.questionsContainer}>
           {questions.map((question, index) => (
@@ -342,9 +370,20 @@ const ReadingSchedule = () => {
         />
       </div>
       <div className={styles.saveButtonContainer}>
-        <button className="save-chapter" onClick={handleSaveChapter}>
-          {assignmentId ? "Update Chapter" : "Save Chapter"}
-        </button>
+      <Button 
+        variant="contained" 
+        onClick={handleSaveChapter} 
+        sx={{ 
+          mb: 3, 
+          backgroundColor: '#0071ba', 
+          '&:hover': { 
+            backgroundColor: '#005a99' // Slightly darker shade for hover effect
+          }
+        }}
+      >
+        {assignmentId ? "Update Chapter" : "Save Chapter"}
+      </Button>
+
       </div>
     </div>
   );
