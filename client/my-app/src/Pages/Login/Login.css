@@ -6,7 +6,7 @@
     position: relative;
     overflow: hidden;
     background-color: #b3dcfd;
-    background-image: url(create-users_bgd.png);
+    background-image: url(../../assets/create-users_bgd.png);
     background-size: 125%; 
     background-position: center;
   }
@@ -35,7 +35,7 @@
   }
 
   .image-container {
-    background-image: url(login_left_panel.png);
+    background-image: url(../../assets/login_left_panel.png);
     background-size: cover; /* Ensure the image covers the container */
     background-position: center; /* Center the image */
     flex: 0.7;

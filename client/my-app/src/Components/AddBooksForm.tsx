@@ -14,43 +14,20 @@ import {
 import { ActionCodeOperation } from "firebase/auth";
 import { Icon } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
-
-
-//same thing as Library
-type ChapterQuestions = {
-  chapterId: string;
-  chapterNumber: number;
-  questions: string[];
-  answers: string[];
-};
-
-type Book = {
-  id: string;
-  title: string;
-  description?: string;
-  chapters?: ChapterQuestions[];
-  imageUrl?: string;
-};
-
-type AddBookFormProps = {
-  book: Book;
-  onSave: (bookData: Book) => void;
-  onClose: () => void;
-};
+import {Book, ChapterQuestions, AddBookFormProps} from "../types/types";
 
 const AddBooksForm: React.FC<AddBookFormProps> = ({
   book,
   onSave,
   onClose,
 }) => {
-  const [title, setTitle] = useState(book.title); //this is the current title of the book
-  const [description, setDescription] = useState(book.description || ""); //this is the description of book
-  const [imageUrl, setImageUrl] = useState(book.imageUrl || ""); //this is urlImage
+  const [title, setTitle] = useState(book.title);
+  const [description, setDescription] = useState(book.description || "");
+  const [imageUrl, setImageUrl] = useState(book.imageUrl || "");
   const [activeBook, setActiveBook] = useState<Book | null>(null);
   const [chapters, setChapters] = useState(
     book.chapters || [
       {
-        //these are chapters
         chapterId: Date.now().toString(),
         chapterNumber: 1,
         questions: [],
@@ -59,23 +36,18 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
     ],
   );
 
-  const [deleteChapters, doDeleteChapters] = useState<string[]>([]); //store ids
+  const [deleteChapters, doDeleteChapters] = useState<string[]>([]);
   const [numberOfChapters, setNumberOfChapters] = useState(
     chapters.length || 1,
-  ); //number of chapters
+  );
 
-  const [activeChapter, setExactChapter] = useState(0); //which on you're on
-  //when you submit, save whatever's in useState to array and database
+  const [activeChapter, setExactChapter] = useState(0);
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
-    // Reference to the existing book document
     const bookRef = doc(db, "books", book.id);
 
-    // Prepare a batch update for chapters to handle them all together
     const batch = writeBatch(db);
 
-    // Add book update to the batch and update in array
     batch.update(bookRef, {
       title: title,
       description: description,
@@ -87,9 +59,7 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
     book.chapters = chapters;
     book.description = description;
     book.imageUrl = imageUrl;
-    // Add chapter updates or creations to the batch
     chapters.forEach((chapter, index) => {
-      //update them chapters
       const chapterRef = doc(
         db,
         "books",
@@ -105,24 +75,20 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
           answers: chapter.answers,
         },
         { merge: true },
-      ); // Use merge to not overwrite other fields
+      ); 
     });
     deleteChapters.forEach((chapterId) => {
       const chapterRef = doc(db, "books", book.id, "Chapters", chapterId);
-      batch.delete(chapterRef); // Delete the entire chapter document
-      //   console.log(`Chapter ${chapterId} marked for deletion.`);
+      batch.delete(chapterRef);
     });
 
-    // Commit the batch
     try {
       await batch.commit();
       doDeleteChapters([]);
-      //   console.log("All updates committed successfully");
-      // Optionally, call onSave with the updated book details if needed
       console.log("All updates committed successfully");
-      onClose(); // This will close the form
+      onClose();
     } catch (error) {
-      //   console.error("Error committing updates: ", error);
+      console.error("Error committing updates: ", error);
     }
   };
 
@@ -132,9 +98,6 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
     questionIndex: number,
   ) => {
     const newChapters = [...chapters];
-    // console.log(activeChapter);
-    // console.log(chapterIndex);
-    // console.log(newChapters);
     newChapters[chapterIndex].questions[questionIndex] = question;
     setChapters(newChapters);
   };
@@ -155,8 +118,6 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
     const diff = count - newChapters.length;
     const currLength = newChapters.length;
     const append = Date.now().toString();
-
-    // Add the new chapter to the end of the new array
     if (diff > 0) {
       for (let i = 0; i < diff; i++) {
         const append = Date.now().toString() + i;
@@ -169,8 +130,6 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
           answers: [],
         });
       }
-
-      // Update the state with the new chapters array
     } else if (diff < 0) {
       const chaptersToRemove = newChapters.slice(count);
       newChapters.splice(count);
@@ -187,24 +146,18 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
   };
 
   const addQuestionToChapter = async (chapterIndex: number) => {
-    // Make a shallow copy of the chapters array
     const newChapters = [...chapters];
-
-    // Check if the chapter has a questions array, and if not, initialize it
     const updatedQuestions = [
       ...newChapters[chapterIndex].questions,
       "",
     ];
     const updatedAnswers = [...newChapters[chapterIndex].answers, ""];
 
-    // Update the local copy of the chapters array with the new question and answer
     newChapters[chapterIndex] = {
       ...newChapters[chapterIndex],
       questions: updatedQuestions,
       answers: updatedAnswers,
     };
-
-    // Define the Firestore document reference for the specific chapter
 
     setChapters(newChapters);
   };
@@ -233,7 +186,7 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
   };
 
   const handleAddBookClick = () => {
-    const tempId = `temp-${Date.now()}`; // Generate a temporary unique ID
+    const tempId = `temp-${Date.now()}`;
     setActiveBook({
       id: tempId,
       title: "",
@@ -287,11 +240,10 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
           />
         </label>
         <div className="chapter-controls">
-          {/* Number of Chapters input */}
           <div className="number-of-chapters">
             <label>
               Number of Chapters:
-              <input //how many
+              <input
                 type="number"
                 value={numberOfChapters}
                 onChange={(e) =>
@@ -311,7 +263,7 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
               onChange={(e) => setExactChapter(Number(e.target.value))}
               className="form-select"
             >
-              <option value="">Select Chapter</option> {/* Add this line */}
+              <option value="">Select Chapter</option>
               {chapters.map((item, index) => (
                 <option key={index} value={item.chapterNumber}>
                   Chapter {item.chapterNumber}

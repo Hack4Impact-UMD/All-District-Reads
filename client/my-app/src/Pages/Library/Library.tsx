@@ -26,22 +26,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-
-
-type ChapterQuestions = {
-  chapterId: string;
-  chapterNumber: number;
-  questions: string[];
-  answers: string[];
-};
-
-type Book = {
-  id: string;
-  title: string;
-  description?: string;
-  chapters?: ChapterQuestions[];
-  imageUrl?: string;
-};
+import {Book, ChapterQuestions} from "../../types/types";
 
 const Library: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -164,7 +149,6 @@ const Library: React.FC = () => {
     let savedBookId = bookData.id;
 
     if (!bookData.id.startsWith("temp-")) {
-      // Existing book: Update logic here
     } else {
       const docRef = await addDoc(collection(db, "books"), {
         title: bookData.title,

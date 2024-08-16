@@ -38,6 +38,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import {TablePaginationActionsProps, ReadingAssignment} from "../../types/types";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -49,24 +50,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-interface TablePaginationActionsProps {
-  count: number;
-  page: number;
-  rowsPerPage: number;
-  onPageChange: (
-    event: React.MouseEvent<HTMLButtonElement>,
-    newPage: number,
-  ) => void;
-}
-
-interface ReadingAssignment {
-  id: string;
-  title: string;
-  bookId: string;
-  bookTitle?: string;
-  readingPeriod: string;
-  dueDate: string;
-}
 
 function TablePaginationActions(props: TablePaginationActionsProps) {
   const theme = useTheme();

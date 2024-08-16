@@ -1,5 +1,4 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { UserType } from "../types/types";
 
 export function createAdminUser(userId: string, email: string, name: string): Promise<void> {
   return new Promise((resolve, reject) => {

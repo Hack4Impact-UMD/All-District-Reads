@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../../config/firebase";
-import { collection, getDocs, doc, setDoc, getDoc } from "firebase/firestore"; // Import getDoc
+import { collection, getDocs, doc, setDoc, getDoc } from "firebase/firestore";
 import {
   FormControl,
   InputLabel,
@@ -15,22 +15,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import styles from "./ReadingAssignment.module.css";
 import dayjs, { Dayjs } from 'dayjs';
-import { useParams, useNavigate } from "react-router-dom"; // Import useParams
-
-type Chapter = {
-  chapterId: string;
-  chapterNumber: number;
-  questions: string[];
-  answers: string[];
-};
-
-type Book = {
-  id: string;
-  title: string;
-  description?: string;
-  chapters?: Chapter[];
-  imageUrl?: string;
-};
+import { useParams, useNavigate } from "react-router-dom";
+import {Chapter, Book} from "../../types/types";
 
 
 const ReadingSchedule = () => {
@@ -47,12 +33,12 @@ const ReadingSchedule = () => {
   const [chapterAssignmentTitle, setChapterAssignmentTitle] = useState("");
   const [assignmentDescription, setAssignmentDescription] = useState("");
   const [url, setUrl] = useState("");
-  const [allSelected, setAllSelected] = useState<boolean>(false); // New state
+  const [allSelected, setAllSelected] = useState<boolean>(false);
   const navigate = useNavigate(); 
 
 
 
-  const { schoolDistrictId, assignmentId } = useParams(); // Get the parameters from the URL
+  const { schoolDistrictId, assignmentId } = useParams();
 
   // Fetch all books
   useEffect(() => {
@@ -377,7 +363,7 @@ const ReadingSchedule = () => {
           mb: 3, 
           backgroundColor: '#0071ba', 
           '&:hover': { 
-            backgroundColor: '#005a99' // Slightly darker shade for hover effect
+            backgroundColor: '#005a99'
           }
         }}
       >

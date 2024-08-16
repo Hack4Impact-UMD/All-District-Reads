@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./Navbar.css";
-import adrLogo from "./ADR_web_logo.png";
 import { useAuth } from "../Auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,30 +10,29 @@ import {
 } from "firebase/app";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import firebaseConfig from "../../config/firebase";
+import adrLogo from "../../assets/ADR_web_logo.png";
 
-// Initialize Firebase app
 let firebaseApp: FirebaseApp;
 try {
   firebaseApp = initializeApp(firebaseConfig as FirebaseOptions);
 } catch (error) {
-  firebaseApp = getApp(); // If the app is already initialized, get the existing app
+  firebaseApp = getApp();
 }
 
 const Navbar: React.FC = () => {
-  const authContext = useAuth(); // Access the auth context
+  const authContext = useAuth();
   const navigate = useNavigate();
   const [schoolDistrictId, setSchoolDistrictId] = useState<string | null>(null);
 
   const handleLogout = async () => {
     try {
-      await authContext.logout(); // Call the logout method from AuthContext
-      navigate("/"); // Redirect to the login page after logging out
+      await authContext.logout();
+      navigate("/");
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
 
-  // Navigate to the reading schedule
   const handleNavigateToReadingSchedule = async () => {
     const userId = authContext.user?.uid;
 
@@ -51,8 +49,6 @@ const Navbar: React.FC = () => {
       const userData = userDoc.data();
       const districtId = userData?.schoolDistrictId || "Unknown";
       setSchoolDistrictId(districtId);
-
-      // Navigate to the reading schedule page with the schoolDistrictId
       if (districtId !== "Unknown") {
         navigate(`/schedule/schoolDistrict/${districtId}`);
       } else {
@@ -73,7 +69,6 @@ const Navbar: React.FC = () => {
         <a href="/createUsers" className="nav-link">
           CREATE USERS
         </a>
-        {/* Use onClick to dynamically navigate to the reading schedule */}
         <a className="nav-link" onClick={handleNavigateToReadingSchedule}>
           READING SCHEDULE
         </a>

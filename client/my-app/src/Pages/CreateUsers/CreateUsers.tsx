@@ -35,6 +35,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
+import adrLogo from "../../assets/ADR_web_logo.png"
 
 // Initialize Firebase app
 let firebaseApp: FirebaseApp;
@@ -43,8 +44,6 @@ try {
 } catch (error) {
   firebaseApp = getApp(); // If the app is already initialized, get the existing app
 }
-
-
 
 const CreateUsers: React.FC = () => {
   const authContext = useAuth();
@@ -187,7 +186,7 @@ const CreateUsers: React.FC = () => {
       setRetypePassword("");
       setNewUserName("");
       setSchoolDistrictId("");
-      setShowPassword(false); // Reset the visibility to default
+      setShowPassword(false); 
       setShowRetypePassword(false);
       setRegistrationSuccess(true);
       unsubscribe();
@@ -210,7 +209,7 @@ const CreateUsers: React.FC = () => {
         <img
           src="https://alldistrictreads.org/wp-content/uploads/2023/07/All-District-Reads.png"
           alt="navbar-logo"
-          className="adr-logo"
+          className="adr-logo-users"
         />
         <h2>Create New User</h2>
         <div className="heading-text">Select new user type</div>

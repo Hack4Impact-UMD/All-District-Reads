@@ -7,6 +7,8 @@ import {
 } from "@firebase/auth";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import app from "../../config/firebase";
+import {} from "../../types/types";
+
 
 interface Props {
   children: JSX.Element;
@@ -16,14 +18,12 @@ interface AuthContextType {
   user: User | null;
   token: IdTokenResult | null;
   loading: boolean;
-  logout: () => Promise<void>; // Add logout function to the context type
+  logout: () => Promise<void>;
 }
 
 // The AuthContext that other components may subscribe to.
 const AuthContext = createContext<AuthContextType>(null!);
 
-// Updates the AuthContext and re-renders children when the user changes.
-// See onAuthStateChanged for what events trigger a change.
 export const AuthProvider = ({ children }: Props): React.ReactElement => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<IdTokenResult | null>(null);
@@ -33,9 +33,9 @@ export const AuthProvider = ({ children }: Props): React.ReactElement => {
   const logout = async () => {
     const auth = getAuth(app);
     try {
-      await signOut(auth); // Sign out the user using Firebase's signOut method
-      setUser(null); // Reset user state after logout
-      setToken(null); // Reset token state after logout
+      await signOut(auth);
+      setUser(null);
+      setToken(null);
     } catch (error) {
       console.error("Logout error:", error);
     }

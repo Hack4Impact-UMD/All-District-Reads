@@ -13,7 +13,7 @@ import {
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import firebaseConfig from "../../config/firebase";
 import { useNavigate } from "react-router-dom";
-import adrLogo from "./ADR_web_logo.png";
+import adrLogo from "../../assets/ADR_web_logo.png";
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
