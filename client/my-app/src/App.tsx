@@ -5,7 +5,6 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
-import Home from "./Pages/Home/Home";
 import Library from "./Pages/Library/Library";
 import { FirebaseOptions, initializeApp, getApps } from "firebase/app";
 import Login from "./Pages/Login/Login";
@@ -38,7 +37,10 @@ const App: React.FC = () => {
 
         <Route path="/library" 
           element={
+            <RequireADRAuth>
               <Library />
+            </RequireADRAuth>
+              
           }
         />
         
@@ -65,13 +67,13 @@ const App: React.FC = () => {
           </RequireSchoolStaffAuth>
           } 
         />
-        
-        <Route path="/home" element={<Home />} />
 
         <Route
           path="/createUsers"
           element={
+            <RequireADRAuth>
               <CreateUsers/>
+            </RequireADRAuth>
         }
         />
       </Routes>

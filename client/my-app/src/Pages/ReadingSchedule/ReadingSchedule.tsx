@@ -29,11 +29,16 @@ import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import styles from "./ReadingSchedule.module.css";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import {TablePaginationActionsProps, ReadingAssignment} from "../../types/types";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -45,24 +50,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-interface TablePaginationActionsProps {
-  count: number;
-  page: number;
-  rowsPerPage: number;
-  onPageChange: (
-    event: React.MouseEvent<HTMLButtonElement>,
-    newPage: number,
-  ) => void;
-}
-
-interface ReadingAssignment {
-  id: string;
-  title: string;
-  bookId: string;
-  bookTitle?: string;
-  readingPeriod: string;
-  dueDate: string;
-}
 
 function TablePaginationActions(props: TablePaginationActionsProps) {
   const theme = useTheme();
@@ -125,6 +112,8 @@ export default function ReadingScheduleBottom() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = React.useState<ReadingAssignment[]>([]);
   const [filteredRows, setFilteredRows] = React.useState<ReadingAssignment[]>([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<ReadingAssignment | null>(null);
 
   const [filterBookTitle, setFilterBookTitle] = useState("");
   const [filterDueDate, setFilterDueDate] = useState("");
@@ -139,21 +128,21 @@ export default function ReadingScheduleBottom() {
         const q = query(collection(db, "readingSchedules"), where("schoolDistrictId", "==", schoolDistrictId));
         const querySnapshot = await getDocs(q);
         const rowsData = await Promise.all(querySnapshot.docs.map(async (docSnapshot) => {
-          const bookId = docSnapshot.data().bookId;
-          const bookDocRef = doc(db, "books", bookId); 
-          const bookDoc = await getDoc(bookDocRef);
+        const bookId = docSnapshot.data().bookId;
+        const bookDocRef = doc(db, "books", bookId); 
+        const bookDoc = await getDoc(bookDocRef);
 
-          const bookData = bookDoc.data() as { title: string } | undefined;
-          const bookTitle = bookData ? bookData.title : "Unknown Title";
+        const bookData = bookDoc.data() as { title: string } | undefined;
+        const bookTitle = bookData ? bookData.title : "Unknown Title";
 
-          return {
-            id: docSnapshot.id,
-            title: docSnapshot.data().title,
-            bookId,
-            bookTitle,
-            readingPeriod: docSnapshot.data().readingPeriod,
-            dueDate: docSnapshot.data().dueDate,
-          };
+        return {
+          id: docSnapshot.id,
+          title: docSnapshot.data().title,
+          bookId,
+          bookTitle,
+          readingPeriod: docSnapshot.data().readingPeriod,
+          dueDate: docSnapshot.data().dueDate,
+        };
         }));
         setRows(rowsData);
       }
@@ -202,6 +191,25 @@ export default function ReadingScheduleBottom() {
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const handleDeleteClick = (assignment: ReadingAssignment) => {
+    setAssignmentToDelete(assignment);
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (assignmentToDelete) {
+      await deleteDoc(doc(db, "readingSchedules", assignmentToDelete.id));
+      setRows((prevRows) => prevRows.filter((row) => row.id !== assignmentToDelete.id));
+      setAssignmentToDelete(null);
+    }
+    setOpenDialog(false);
+  };
+
+  const handleCancelDelete = () => {
+    setAssignmentToDelete(null);
+    setOpenDialog(false);
   };
 
   const handleDelete = async (id: string) => {
@@ -325,7 +333,7 @@ export default function ReadingScheduleBottom() {
                       <IconButton size="small" onClick={() => handleEdit(row.id)}>
                         <EditOutlinedIcon fontSize="small" />
                       </IconButton>
-                      <IconButton size="small" onClick={() => handleDelete(row.id)}>
+                      <IconButton size="small" onClick={() =>  handleDeleteClick(row)}>
                         <DeleteOutlinedIcon fontSize="small" />
                       </IconButton>
                     </Box>
@@ -372,6 +380,27 @@ export default function ReadingScheduleBottom() {
           </TableFooter>
         </Table>
       </TableContainer>
+      <Dialog
+        open={openDialog}
+        onClose={handleCancelDelete}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sure you want to delete this reading assignment?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Deleting this assignment will remove it permanently and cannot be undone. Do you want to continue?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete}>Cancel</Button>
+          <Button onClick={handleConfirmDelete} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

@@ -30,4 +30,5 @@
 .nav-link:hover {
   background-color: white; /* Slightly lighter blue on hover */
   border-radius: 5px; /* Rounded corners for hover effect */
+  cursor: pointer;
 }

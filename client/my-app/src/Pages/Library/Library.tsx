@@ -20,21 +20,13 @@ import TextField from "@mui/material/TextField";
 import GridViewIcon from "@mui/icons-material/GridView";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import AddIcon from "@mui/icons-material/Add";
-
-type ChapterQuestions = {
-  chapterId: string;
-  chapterNumber: number;
-  questions: string[];
-  answers: string[];
-};
-
-type Book = {
-  id: string;
-  title: string;
-  description?: string;
-  chapters?: ChapterQuestions[];
-  imageUrl?: string;
-};
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import {Book, ChapterQuestions} from "../../types/types";
 
 const Library: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -42,6 +34,8 @@ const Library: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const bookCollection = collection(db, "books");
   const [view, setView] = useState<"grid" | "list" | "add">("grid");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
   const placeholderBook: Book = {
     id: "",
     title: "",
@@ -155,7 +149,6 @@ const Library: React.FC = () => {
     let savedBookId = bookData.id;
 
     if (!bookData.id.startsWith("temp-")) {
-      // Existing book: Update logic here
     } else {
       const docRef = await addDoc(collection(db, "books"), {
         title: bookData.title,
@@ -173,6 +166,24 @@ const Library: React.FC = () => {
 
   const handleCloseModal = () => {
     setActiveBook(null);
+  };
+
+  const handleDeleteClick = (book: Book) => {
+    setBookToDelete(book);
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (bookToDelete) {
+      await deleteBook(bookToDelete.id);
+      setBookToDelete(null);
+    }
+    setOpenDialog(false);
+  };
+
+  const handleCancelDelete = () => {
+    setBookToDelete(null);
+    setOpenDialog(false);
   };
 
   const deleteBook = async (id: string) => {
@@ -273,7 +284,7 @@ const Library: React.FC = () => {
                   <EditOutlinedIcon sx={{ fontSize: 20, alignSelf: 'center' }}/>
                 </button>
                 <button
-                  onClick={() => deleteBook(book.id)}
+                  onClick={() => handleDeleteClick(book)}
                   title = "Delete"
                   className="edit-delete-button"
                 >
@@ -296,7 +307,7 @@ const Library: React.FC = () => {
                 <button onClick={() => setActiveBook(book)} className="edit-delete-list">
                   <EditOutlinedIcon style={{ fontSize: "17px" }} />
                 </button>
-                <button onClick={() => deleteBook(book.id)} className="edit-delete-list">
+                <button onClick={() => handleDeleteClick(book)} className="edit-delete-list">
                   <DeleteOutlinedIcon style={{ fontSize: "17px" }} />
                 </button>
               </div>
@@ -325,6 +336,28 @@ const Library: React.FC = () => {
           />
         </div>
       )}
+
+      <Dialog
+        open={openDialog}
+        onClose={handleCancelDelete}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sure you want to delete this book?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Deleting this book will remove all associated chapters and cannot be undone. Do you want to continue?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete}>Cancel</Button>
+          <Button onClick={handleConfirmDelete} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

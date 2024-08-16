@@ -1,39 +1,54 @@
 import {
   getAuth,
-  onIdTokenChanged,
+  onAuthStateChanged,
+  signOut,
   type User,
   type IdTokenResult,
 } from "@firebase/auth";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import app from "../../config/firebase";
+import {} from "../../types/types";
+
 
 interface Props {
   children: JSX.Element;
 }
 
 interface AuthContextType {
-  user: User;
-  token: IdTokenResult;
+  user: User | null;
+  token: IdTokenResult | null;
   loading: boolean;
+  logout: () => Promise<void>;
 }
 
 // The AuthContext that other components may subscribe to.
 const AuthContext = createContext<AuthContextType>(null!);
 
-// Updates the AuthContext and re-renders children when the user changes.
-// See onIdTokenChanged for what events trigger a change.
 export const AuthProvider = ({ children }: Props): React.ReactElement => {
-  const [user, setUser] = useState<User | any>(null!);
-  const [token, setToken] = useState<IdTokenResult>(null!);
-  // The loading state is used by RequireAuth/RequireAdminAuth
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<IdTokenResult | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Logout function to sign out the current user
+  const logout = async () => {
+    const auth = getAuth(app);
+    try {
+      await signOut(auth);
+      setUser(null);
+      setToken(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   const providerProps = React.useMemo(() => {
-    return { user, token, loading };
+    return { user, token, loading, logout };
   }, [user, token, loading]);
 
   useEffect(() => {
     const auth = getAuth(app);
-    onIdTokenChanged(auth, (newUser) => {
+
+    const unsubscribe = onAuthStateChanged(auth, (newUser) => {
       setUser(newUser);
       if (newUser != null) {
         newUser
@@ -41,8 +56,11 @@ export const AuthProvider = ({ children }: Props): React.ReactElement => {
           .then((newToken) => {
             setToken(newToken);
           })
-          .catch(() => {});
-        // need to set userType once we set up official firebase structure
+          .catch(() => {
+            setToken(null);
+          });
+      } else {
+        setToken(null);
       }
       setLoading(false);
     });

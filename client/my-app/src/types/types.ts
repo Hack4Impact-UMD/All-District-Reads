@@ -32,6 +32,56 @@ export const canCreateUserType = (
       return false; // Other types don't have permission to create new accounts.
   }
 };
+
 export interface CreateUserResponse {
   message: string;
 }
+
+export interface TablePaginationActionsProps {
+  count: number;
+  page: number;
+  rowsPerPage: number;
+  onPageChange: (
+    event: React.MouseEvent<HTMLButtonElement>,
+    newPage: number,
+  ) => void;
+}
+
+export interface ReadingAssignment {
+  id: string;
+  title: string;
+  bookId: string;
+  bookTitle?: string;
+  readingPeriod: string;
+  dueDate: string;
+}
+
+export type Chapter = {
+  chapterId: string;
+  chapterNumber: number;
+  questions: string[];
+  answers: string[];
+};
+
+export type Book = {
+  id: string;
+  title: string;
+  description?: string;
+  chapters?: Chapter[];
+  imageUrl?: string;
+};
+
+export type ChapterQuestions = {
+  chapterId: string;
+  chapterNumber: number;
+  questions: string[];
+  answers: string[];
+};
+
+export type AddBookFormProps = {
+  book: Book;
+  onSave: (bookData: Book) => void;
+  onClose: () => void;
+};
+
+

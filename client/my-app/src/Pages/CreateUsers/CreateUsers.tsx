@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import {
   getAuth,
   createUserWithEmailAndPassword,
+  onAuthStateChanged
 } from "firebase/auth";
 import {
   FirebaseApp,
@@ -34,7 +35,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
-
+import adrLogo from "../../assets/ADR_web_logo.png"
 
 // Initialize Firebase app
 let firebaseApp: FirebaseApp;
@@ -48,7 +49,6 @@ const CreateUsers: React.FC = () => {
   const authContext = useAuth();
   const [currentUserType, setCurrentUserType] = useState<UserType | null>(null);
   const [availableUserTypes, setAvailableUserTypes] = useState<UserType[] | undefined>();
-
   const [newUserType, setNewUserType] = useState<UserType>();
   const [registrationEmail, setRegistrationEmail] = useState("");
   const [registrationPassword, setRegistrationPassword] = useState("");
@@ -59,6 +59,8 @@ const CreateUsers: React.FC = () => {
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRetypePassword, setShowRetypePassword] = useState(false);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (!authContext.loading) {
@@ -78,7 +80,7 @@ const CreateUsers: React.FC = () => {
     if (registrationSuccess) {
       const timer = setTimeout(() => {
         setRegistrationSuccess(false); // Dismiss the alert after 3 seconds
-      }, 3000);
+      }, 10000);
 
       return () => clearTimeout(timer); // Clean up the timeout on component unmount
     }
@@ -144,13 +146,23 @@ const CreateUsers: React.FC = () => {
 
     try {
       const auth = getAuth(firebaseApp);
+      const currentUser = auth.currentUser;
+      setRegistrationSuccess(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const unsubscribe = onAuthStateChanged(auth, () => {});
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         registrationEmail,
         registrationPassword
       );
 
+      await auth.updateCurrentUser(currentUser);
+
+
       const userId = userCredential.user.uid;
+      
+
 
       if (newUserType === UserType.ADRAdmin) {
         await createAdminUser(userId, registrationEmail, newUserName);
@@ -174,8 +186,10 @@ const CreateUsers: React.FC = () => {
       setRetypePassword("");
       setNewUserName("");
       setSchoolDistrictId("");
-      setShowPassword(false); // Reset the visibility to default
-      setShowRetypePassword(false); // Reset the retype visibility to default
+      setShowPassword(false); 
+      setShowRetypePassword(false);
+      setRegistrationSuccess(true);
+      unsubscribe();
     } catch (error: any) {
       console.error("Registration error:", error.message);
       setRegistrationError("Registration error: " + error.message);
@@ -195,7 +209,7 @@ const CreateUsers: React.FC = () => {
         <img
           src="https://alldistrictreads.org/wp-content/uploads/2023/07/All-District-Reads.png"
           alt="navbar-logo"
-          className="adr-logo"
+          className="adr-logo-users"
         />
         <h2>Create New User</h2>
         <div className="heading-text">Select new user type</div>

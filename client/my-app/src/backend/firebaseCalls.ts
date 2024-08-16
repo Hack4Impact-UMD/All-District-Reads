@@ -5,9 +5,6 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import app from "../config/firebase";
-import { ReadingSchedule } from "../types/types";
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "../config/firebase";
 
 export function authenticateUser(email: string, password: string) {
   return new Promise((resolve, reject) => {
@@ -18,21 +15,6 @@ export function authenticateUser(email: string, password: string) {
       })
       .catch((error: AuthError) => {
         reject(error);
-      });
-  });
-}
-
-export function addReadingSchedule(
-  readingSchedule: ReadingSchedule,
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    addDoc(collection(db, "readingSchedules"), readingSchedule)
-      .then((docRef) => {
-        // return id of reading schedule added
-        resolve(docRef.id);
-      })
-      .catch((e) => {
-        reject(e);
       });
   });
 }

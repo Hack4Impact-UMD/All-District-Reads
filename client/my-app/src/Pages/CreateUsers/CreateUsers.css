@@ -7,7 +7,7 @@
   position: relative;
   overflow: hidden;
   background-color: #b3dcfd;
-  background-image: url(create-users_bgd.png);
+  background-image: url(../../assets/create-users_bgd.png);
   background-size: 125%; 
   background-position: center;
 }
@@ -159,9 +159,9 @@
   transition: background 0.3s ease; /* Smooth transition for hover effect */
 }
 
-.adr-logo {
+.adr-logo-users {
   margin-top: 5%;
   align-self: center;
-  width: 20%;
+  width: 16%;
   height: auto;
 }
