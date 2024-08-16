@@ -1,105 +1,77 @@
 .add-books-form {
-  position: fixed; /* Position the form relative to the viewport */
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1000; /* Ensure it sits on top of other content */
-  max-width: 600px; /* Set a max-width for the form */
-  width: 100%; /* Responsive width */
-  max-height: 90vh; /* Limit the height to 80% of the viewport */
-  overflow-y: auto; /* Enable vertical scrolling if content overflows */
+  z-index: 1000;
+  max-width: 700px; /* Increased max-width for better readability */
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
   background-color: #ffffff;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Stronger shadow for better focus */
-  box-sizing: border-box; /* Includes padding in the width and height */
+  padding: 30px; /* Added extra padding for more breathing room */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Slightly softer shadow */
+  border-radius: 10px; /* Added rounded corners */
 }
 
 .close-button {
   position: absolute;
-  right: 10px;
-  top: 5px;
+  right: 15px;
+  top: 15px;
   background: none;
   border: none;
-  font-size: 0.8rem;
+  font-size: 1rem;
   cursor: pointer;
+  color: #0071ba; /* Matched color with title */
 }
 
-/* Add a backdrop */
-.backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-  z-index: 999; /* Just below the popup */
+.edit-book-title {
+  font-size: 2.2em; /* Slightly larger font size for emphasis */
+  color: #0071ba;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .add-books-form input[type="text"],
 .add-books-form textarea {
-  width: calc(100% - 24px);
-  /* Adjusted width for padding */
-  padding: 12px;
+  width: 100%; /* Full-width inputs */
+  padding: 15px; /* Larger padding for better usability */
   margin: 10px 0;
   display: block;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 8px; /* More pronounced border-radius */
   box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.add-books-form textarea {
+  min-height: 100px;
 }
 
 .input-group input[type="text"]::placeholder,
 .add-books-form textarea::placeholder {
-  color: #ccc;
-  font-style: italic;
+  color: #aaa; /* Softer placeholder color */
 }
 
 .add-books-form button {
-  background-color: #747272;
+  background-color: #0071ba; /* Updated color for buttons */
   color: white;
-  padding: 14px 20px;
+  padding: 12px 20px;
   margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.add-books-form label {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 5px;
-  display: block;
-}
-
-.add-books-form button[type="button"] {
-  /* Styling for 'Add Question' button */
-  background-color: #747272;
-  color: white;
-  padding: 14px 24px;
-  margin: 20px 0 10px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+  font-size: 1rem;
 }
 
 .add-books-form button:hover {
-  opacity: 0.9;
-  background-color: #414141;
-  transition: 400ms;
-}
-
-.add-books-form .close {
-  margin-bottom: 20px;
-  /* Give some space between the close button and the form elements */
-  display: inline-block;
-  /* To enable margin-top to work */
-  cursor: pointer;
+  background-color: #005f9c; /* Darker shade for hover effect */
 }
 
 .add-books-form .question-input {
   display: flex;
-  margin-bottom: 10px;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .add-books-form .question-input input {
@@ -107,142 +79,90 @@
   margin-right: 10px;
 }
 
-.input-group {
-  display: flex;
-  align-items: center;
-}
-
-.upload-cover {
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  text-align: center;
-  color: #888;
-  padding: 20px;
-  margin-top: 20px;
-}
-
-.upload-cover:hover {
-  border-color: #777;
-}
-
-.chapter-questions {
-  background-color: #f6f6f6;
-  padding: 20px;
-  margin-top: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.question-item {
-  margin-bottom: 15px;
-}
-
-.question-item label {
-  font-weight: bold;
-}
-
-.question-item input[type="text"] {
-  margin-top: 5px;
-  /* Spacing above inputs within a question */
-}
-
-/* Edit question modal styling */
-.edit-question-modal {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  /* Or absolute, depending on your needs */
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 500px;
-  /* Adjust the width as needed */
-  z-index: 10;
-}
-
-.form-section {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.small-input {
-  max-width: 100%;
-  background-color: #f6f6f6;
-}
-
-.large-input {
-  width: 100%;
-}
-
-/* Adjustments for the textarea to look larger */
-.form-textarea.large-input {
-  height: 150px;
-  background-color: #f6f6f6;
-  resize: vertical;
-}
-
 .chapter-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  /* space between the elements */
   margin-bottom: 20px;
 }
 
-/* Style for the number input and select dropdown */
 .chapter-controls input[type="number"],
 .chapter-controls .form-select {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-size: 1rem;
 }
 
-/* Style for the labels */
-.chapter-controls label {
+.chapter-questions {
+  background-color: #f9f9f9;
+  padding: 25px;
+  margin-top: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow for more emphasis */
+}
+
+.question-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.question-item label {
+  font-weight: bold;
   display: block;
   margin-bottom: 5px;
-  color: #333;
-  font-weight: 600;
-  /* Make labels bold */
-}
-
-.number-of-chapters label,
-.select-chapter label {
-  margin-top: 0;
 }
 
 .delete-question {
   border: none;
   background-color: transparent;
-  color: #747272;
+  color: #ff5e5e; /* Red color for delete button to indicate action */
   font-weight: bold;
   cursor: pointer;
-  position: absolute;
   right: 10px;
-  top: 75%;
-  transform: translateY(-50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 15px;
-  height: 15px;
-  border-radius: 15px;
-  /* Circular shape */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  top: 50%;
+  height: 3em;
 }
 
 .delete-question:hover {
-  background-color: #181817;
-  color: #ffffff;
+  color: #ff3b3b;
 }
 
-.question-item {
-  position: relative;
-  margin-bottom: 15px;
-  padding-right: 40px;
+.question-delete{
+  display: flex;
+  flex-direction: row;
+  gap: 1%;
+  align-items: center;
+}
+
+.add-question {
+  background-color: #0071ba;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.add-question:hover {
+  background-color: #005f9c;
+}
+
+/* Backdrop style */
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Darker backdrop */
+  z-index: 999;
+}
+
+.chapter-heading{
+  font-size: 1.3em;
+  color: #0071ba;
 }

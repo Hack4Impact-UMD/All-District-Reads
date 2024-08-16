@@ -56,6 +56,32 @@
   border-radius: 6px;
 }
 
+.name-id {
+  align-self: center;
+  display: flex;
+  flex-direction: row;
+  gap: 1.7%;
+  width: 53%;
+}
+
+.name-id.full-width {
+  width: 100%;
+  justify-content: center;
+}
+
+.user-input-field {
+  width: 100%;
+  padding: 2%;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 2px 2px 5px rgb(47, 47, 48); /* Add a blue shadow when focused */
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  border: none;
+}
+
+
 /* The "Create New User" Title */
 .user-form-container h2 {
   align-self: center;
@@ -63,6 +89,7 @@
   font-size: 24px;
   color: #333;
 }
+
 
 /* email and password input fields */
 .user-form-container input {
@@ -72,21 +99,41 @@
   font-size: 16px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  width: 50%;
+  width: 50%
 }
 
-.user-input-field {
-  width: 60%;
-  padding: 2%;
-  font-size: 16px;
-  cursor: pointer;
-  box-shadow: 2px 2px 5px rgb(47, 47, 48); /* Add a blue shadow when focused */
-  border-radius: 4px;
+/* General styling for the input fields */
+/*  */
+
+/* Container for input field and visibility icon */
+.password-icon {
+  align-self: center;
   display: flex;
-  margin-bottom: 15px;
-  font-size: 16px;
-  border: none;
+  flex-direction: row;
+  align-items: center;
+  width: 53%; /* Same width as other input fields */
+  position: relative;
 }
+
+/* Visibility icon styling */
+.visibility-icon {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  top: 40%;
+  transform: translateY(-50%);
+}
+
+/* Password field styling to account for the icon */
+.password-icon input {
+  width: 100%;
+  padding-right: 40px; /* Add padding to make room for the icon */
+  font-size: 16px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
 
 /* The create user submit button at bottom */
 .user-form-container button {
@@ -97,7 +144,7 @@
   color: white;
   border: none;
   border-radius: 4px;
-  width: 50%;
+  width: 30%;
 
   color: white;
   border: none;

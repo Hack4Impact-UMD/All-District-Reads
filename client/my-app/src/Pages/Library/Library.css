@@ -1,11 +1,12 @@
 h1 {
-  font-family: "Times New Roman", Times, serif;
   color: white;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 h2 {
-  font-weight: 30px;
-  font-size: 20px;
+  font-weight: 350;
+  font-size: 1.25em;
+  color: black;
 }
 
 .modal {
@@ -19,18 +20,7 @@ h2 {
   overflow: auto;
   background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
-  padding-top: 60px;
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 5% auto;
-  padding: 15px;
-  border: 1px solid #888;
-  width: 80%;
-  box-shadow:
-    0 4px 8px 0 rgba(0, 0, 0, 0.2),
-    0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  padding-top: 3em;
 }
 
 .close {
@@ -66,17 +56,16 @@ h2 {
 .library-container {
   grid-template-columns: repeat(auto-fill, minmax(300px, 10fr));
   max-height: auto;
-  font-family: "Times New Roman", Times, serif;
-  background-color: black;
+  background-color: rgb(225, 242, 253);
 }
 
 .book-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  /* This creates space between the books */
-  padding: 20px;
   flex-grow: 1;
+  margin-right: 3%;
+  gap: 1.25em;
+  padding: 1.25em;
   margin-right: 3%;
 }
 
@@ -97,10 +86,8 @@ h2 {
 }
 
 .book-image-container {
-  height: 250px;
-  /* Set this to the desired height */
+  height: 16em;
   background-color: #f4f4f4;
-  /* Placeholder color if there's no image */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -118,15 +105,15 @@ h2 {
   justify-content: center;
   align-items: center;
   background-color: #f4f4f4;
-  height: 150px;
   color: #666;
-  font-size: 14px;
+  height: 9.375em;
+  font-size: 0.875em;
 }
 
 .book-title {
   white-space: inherit;
-  margin: 10px 0;
-  padding: 0 10px;
+  margin: 0.625em 0;
+  padding: 0 0.625em;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -140,20 +127,11 @@ h2 {
   transform: translate(-50%, -50%);
 }
 
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  background-color: #333;
-  color: #fff;
-}
-
 .library-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 10px;
+  padding: 0.625em;
   padding-left: 2.5%;
   padding-right: 2.5%;
   background-color: #0071ba;
@@ -161,36 +139,36 @@ h2 {
 }
 
 .search-bar {
-  margin-bottom: 20px;
-  margin-left: 130px;
-  border-radius: 4px;
   background-color: #013e67;
-
   color: white;
-  width: 300px;
-  height: 20px;
+  margin-bottom: 2em;
+  margin-left: 8.125em;
+  border-radius: 0.25em;
+  width: 19.75em;
+  height: 1.75em;
 }
 
 .book-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 270px;
+  width: 16.875em;
+  margin: 0.625em;
   max-width: 100%;
-  margin: 10px;
 }
 
 .edit-book,
 .delete-book {
   position: absolute;
-  top: 5px;
-  right: 5px;
+
   z-index: 10;
   color: black;
+  top: 0.3125em;
+  right: 0.3125em;
 }
 
 .edit-book {
-  right: 60px;
+  right: 3.75em;
   background-color: #bfc3bf;
 }
 
@@ -237,25 +215,41 @@ h2 {
 .view-buttons {
   display: flex;
   align-items: center;
-  gap: 890px;
+  gap: 5em;
   /* Adjust as needed */
   padding-left: 2.5%;
-  background-color: black;
   color: white;
+  width: 100%;
+
   /* This will push the buttons to the end of the search bar */
 }
 
 .view-button {
-  height: 30px;
-  font-size: 12px;
+  justify-content: center;
+  align-items: center;
+  height: 2.5em;
+  font-size: 0.75em;
+  color: #0071ba;
+}
+
+.edit-delete-button {
+  justify-content: center;
+  align-items: center;
+  height: 2.5em;
+  font-size: 0.75em;
+  color: #0071ba;
+  border-radius: 2px;
+  margin-right: 3%;
 }
 
 .buttons {
-  position: absolute;
-  right: 0;
   display: flex;
   align-items: center;
   gap: 7px;
+  justify-content: left;
+  position: absolute;
+  right: 0;
+  margin-right: 2.6em;
 }
 
 .icon {
@@ -263,14 +257,14 @@ h2 {
 }
 
 .view-buttons button {
-  padding: 8px 16px;
   border: none;
-  background-color: #ddd;
+  background-color: white;
   border: 1px solid #ccc;
   cursor: pointer;
-  border-radius: 4px;
   outline: none;
   transition: background-color 0.3s ease;
+  padding: 0.5em 1em;
+  border-radius: 0.25em;
 }
 
 .view-buttons button:hover {
@@ -283,8 +277,14 @@ h2 {
 
 .book-list-item {
   border-bottom: 1px solid #ddd;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 1%;
+  margin-bottom: 0.8%;
+  margin-left: 1em;
+  margin-right: 2.6em;
+}
+
+.book-title{
+  color: black;
 }
 
 .book-card-options {
@@ -292,12 +292,10 @@ h2 {
   position: absolute;
   right: 0;
   top: 0;
-  background: rgba(255, 255, 255, 0.9);
 }
 
 .book-card:hover .book-card-options {
-  display: block;
-  /* Show options on hover */
+  display: flex;
 }
 
 .book-card-options button {
@@ -315,14 +313,32 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 0.625em;
   border-bottom: 1px solid #ddd;
 }
 
 .book-list-options button {
-  margin-left: 10px;
+  margin-left: 0.625em;
 }
+
+.edit-delete-list{
+  background-color: white;
+  border: none;
+  color: #0071ba;
+  border-radius: 2px;
+  border-width: 10px;
+}
+
+.edit-delete-list:hover{
+  background-color: rgb(238, 238, 238);
+}
+
 
 .form-vals {
   border-radius: 10px;
+}
+
+.recently-added {
+  font-size: larger;
+  color: #0071ba;
 }

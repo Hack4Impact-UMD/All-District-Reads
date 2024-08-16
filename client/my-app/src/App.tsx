@@ -38,9 +38,7 @@ const App: React.FC = () => {
 
         <Route path="/library" 
           element={
-            <RequireADRAuth>
               <Library />
-            </RequireADRAuth>
           }
         />
         
@@ -73,9 +71,7 @@ const App: React.FC = () => {
         <Route
           path="/createUsers"
           element={
-            <RequireADRAuth>
               <CreateUsers/>
-            </RequireADRAuth>
         }
         />
       </Routes>
