@@ -42,7 +42,7 @@ const App: React.FC = () => {
           }
         />
         
-        <Route path="/schedule/add" 
+        <Route path="/schedule/:schoolDistrictId/add" 
           element={
           <RequireSchoolStaffAuth>
             <ReadingAssignment />
