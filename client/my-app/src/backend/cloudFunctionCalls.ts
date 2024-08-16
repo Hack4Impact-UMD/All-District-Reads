@@ -1,7 +1,7 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { UserType } from "../types/types";
 
-export function createAdminUser(userId: string, email: string): Promise<void> {
+export function createAdminUser(userId: string, email: string, name: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const functions = getFunctions();
     const createAdminCloudFunction = httpsCallable(
@@ -12,8 +12,7 @@ export function createAdminUser(userId: string, email: string): Promise<void> {
     createAdminCloudFunction({
       userId: userId,
       email: email,
-      name: "",
-      schoolId: "",
+      name: name,
       schoolDistrictId: "",
       numChildren: "",
       userType: "ADRAdmin",
@@ -28,7 +27,7 @@ export function createAdminUser(userId: string, email: string): Promise<void> {
   });
 }
 
-export function createADRStaffUser(userId: string, email: string): Promise<void> {
+export function createADRStaffUser(userId: string, email: string, name: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const functions = getFunctions();
     const createADRStaffCloudFunction = httpsCallable(
@@ -39,8 +38,7 @@ export function createADRStaffUser(userId: string, email: string): Promise<void>
     createADRStaffCloudFunction({
       userId: userId,
       email: email,
-      name: "test",
-      schoolId: "",
+      name: name,
       numChildren: "",
       schoolDistrictId: "",
       userType: "ADRStaff",
@@ -55,7 +53,7 @@ export function createADRStaffUser(userId: string, email: string): Promise<void>
   });
 }
 
-export function createSchoolStaffUser(userId: string, email: string): Promise<void> {
+export function createSchoolStaffUser(userId: string, email: string, name: string, schoolDistrictId: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const functions = getFunctions();
     const createSchoolStaffCloudFunction = httpsCallable(
@@ -66,10 +64,10 @@ export function createSchoolStaffUser(userId: string, email: string): Promise<vo
     createSchoolStaffCloudFunction({
       userId: userId,
       email: email,
-      name: "test",
+      name: name,
       numChildren: "",
       schoolId: "",
-      schoolDistrictId: "",
+      schoolDistrictId: schoolDistrictId,
       userType: "SchoolStaff",
     })
       .then(async () => {

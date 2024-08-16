@@ -13,8 +13,14 @@ import {
   doc,
   writeBatch,
 } from "firebase/firestore";
+import Paper from "@mui/material/Paper";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import TextField from "@mui/material/TextField";
+import GridViewIcon from "@mui/icons-material/GridView";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import AddIcon from "@mui/icons-material/Add";
 
-//parallels the database, honestly don't need to have lol
 type ChapterQuestions = {
   chapterId: string;
   chapterNumber: number;
@@ -44,7 +50,6 @@ const Library: React.FC = () => {
     imageUrl: "",
   };
 
-  //load the books
   useEffect(() => {
     const fetchBooks = async () => {
       const querySnapshot = await getDocs(bookCollection);
@@ -52,9 +57,8 @@ const Library: React.FC = () => {
 
       for (const doc of querySnapshot.docs) {
         const bookData: Book = doc.data() as Book;
-        bookData.id = doc.id; // Make sure to set the book id from the document
+        bookData.id = doc.id;
 
-        // Now fetch chapters for this book
         const chaptersRef = collection(db, "books", doc.id, "Chapters");
         const chaptersSnapshot = await getDocs(chaptersRef);
         const chapterMap: { [key: number]: ChapterQuestions } = {};
@@ -63,17 +67,15 @@ const Library: React.FC = () => {
           const chapterData = chapterDoc.data();
           const chapterNumber = chapterData.chapterNumber;
 
-          // Initialize the chapter in the map if it doesn't exist
           if (!chapterMap[chapterNumber]) {
             chapterMap[chapterNumber] = {
-              chapterId: chapterDoc.id, // Assuming the chapter document id is what you mean by chapterData.id
+              chapterId: chapterDoc.id,
               chapterNumber: chapterNumber,
               questions: [],
               answers: [],
             };
           }
 
-          // Push the question and answer into the chapter
           if (Array.isArray(chapterData.questions)) {
             chapterMap[chapterNumber].questions.push(...chapterData.questions);
           }
@@ -82,13 +84,10 @@ const Library: React.FC = () => {
           }
         });
 
-        // Convert the map into an array of ChapterQuestions
         bookData.chapters = Object.values(chapterMap);
         booksWithChapters.push(bookData);
-        // console.log(bookData);
       }
 
-      // Set the state with all books including their chapters
       setBooks(booksWithChapters);
     };
 
@@ -101,7 +100,6 @@ const Library: React.FC = () => {
         <div key={book.id} className="book-list-item">
           <div className="book-list-details">
             <div className="book-title">{book.title || "No Title"}</div>
-            {/* Additional details can be added here */}
           </div>
           <div className="book-list-actions">
             <button onClick={() => setActiveBook(book)}>Edit</button>
@@ -113,7 +111,7 @@ const Library: React.FC = () => {
   );
 
   const handleAddBookClick = () => {
-    const tempId = `temp-${Date.now()}`; // Generate a temporary unique ID
+    const tempId = `temp-${Date.now()}`;
     setActiveBook({
       id: tempId,
       title: "",
@@ -130,8 +128,8 @@ const Library: React.FC = () => {
       {
         chapterId: chId,
         chapterNumber: 1,
-        questions: ["Question"],
-        answers: ["Answer"],
+        questions: [],
+        answers: [],
       },
     ];
     const bookRef = doc(db, "books", id);
@@ -152,51 +150,41 @@ const Library: React.FC = () => {
     });
     setBooks([newBook, ...books]);
   };
+
   const saveBookData = async (bookData: Book) => {
     let savedBookId = bookData.id;
 
     if (!bookData.id.startsWith("temp-")) {
       // Existing book: Update logic here
     } else {
-      // New book: Save logic here
       const docRef = await addDoc(collection(db, "books"), {
         title: bookData.title,
         description: bookData.description,
-        // Other properties...
       });
-      savedBookId = docRef.id; // Update with the permanent ID from Firestore
+      savedBookId = docRef.id;
     }
 
-    // Update the local state with the new or updated book
-    // For a new book, replace the temporary ID with the permanent Firestore ID
     setBooks((prevBooks) =>
       prevBooks.map((book) =>
-        book.id === bookData.id ? { ...bookData, id: savedBookId } : book,
-      ),
+        book.id === bookData.id ? { ...bookData, id: savedBookId } : book
+      )
     );
-
-    // Additional logic to handle the state update...
   };
 
   const handleCloseModal = () => {
     setActiveBook(null);
   };
 
-  //delete in database and array
   const deleteBook = async (id: string) => {
     if (!id) {
       console.error("Book ID is invalid.");
       return;
     }
 
-    // Now we're sure the ID is valid, proceed with deletion
     const chaptersRef = collection(db, `books/${id}/Chapters`);
-
-    // Fetch all documents in the "Chapters" subcollection
     const querySnapshot = await getDocs(chaptersRef);
     const batch = writeBatch(db);
 
-    // Add each chapter document to the batch delete
     querySnapshot.forEach((doc) => {
       batch.delete(doc.ref);
     });
@@ -206,7 +194,7 @@ const Library: React.FC = () => {
   };
 
   const filteredBooks = books.filter((book) =>
-    book.title.toLowerCase().includes(searchQuery.toLowerCase()),
+    book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -214,40 +202,48 @@ const Library: React.FC = () => {
       <div className="library-header">
         <h1>Library of Books</h1>
         <div className="search-bar-container">
-          <input
-            type="text"
-            placeholder="Search Library..."
+          <TextField
+            id="outlined-search"
+            label="Search Library"
+            type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-bar"
+            variant="standard"
+            sx={{
+              input: { color: "white" },
+              marginBottom: 2.3,
+              label: { color: "white" },
+              ".MuiInput-underline:before": { borderBottomColor: "white" },
+              ".MuiInput-underline:hover:before": { borderBottomColor: "white" },
+              ".MuiInput-underline:after": { borderBottomColor: "white" },
+            }}
           />
-          {/* View mode buttons */}
         </div>
       </div>
 
       <div className="view-buttons">
-        <h2>Recently Added</h2>
+        <p className="recently-added">Recently Added</p>
         <div className="buttons">
           <button
             className="view-button"
             onClick={() => setView("grid")}
             title="Grid View"
           >
-            <i className="fa fa-th-large"></i> {/* Grid View Icon */}
+            <GridViewIcon sx={{ fontSize: 17, alignSelf: 'center' }}/>
           </button>
           <button
             className="view-button"
             onClick={() => setView("list")}
             title="List View"
           >
-            <i className="fa fa-list"></i> {/* List View Icon */}
+            <FormatListBulletedIcon sx={{ fontSize: 17, alignSelf: 'center'  }}/>
           </button>
           <button
             className="view-button"
             onClick={addBookToLibrary}
             title="Add Book"
           >
-            <i className="fa fa-plus"></i> {/* Add Book Icon */}
+            <AddIcon sx={{ fontSize: 17, alignSelf: 'center'  }}/>
           </button>
         </div>
       </div>
@@ -255,7 +251,7 @@ const Library: React.FC = () => {
       {view === "grid" && (
         <div className="book-grid">
           {filteredBooks.map((book) => (
-            <div className="book-card" key={book.id}>
+            <Paper elevation={10} className="book-card" key={book.id}>
               <div className="book-image-container">
                 {book.imageUrl ? (
                   <img
@@ -271,18 +267,20 @@ const Library: React.FC = () => {
               <div className="book-card-options">
                 <button
                   onClick={() => setActiveBook(book)}
-                  className="edit-book"
+                  title = "Edit"
+                  className="edit-delete-button"
                 >
-                  <i className="icon">&#x270E;</i>
+                  <EditOutlinedIcon sx={{ fontSize: 20, alignSelf: 'center' }}/>
                 </button>
                 <button
                   onClick={() => deleteBook(book.id)}
-                  className="delete-book"
+                  title = "Delete"
+                  className="edit-delete-button"
                 >
-                  <i className="icon fa fa-trash-o"></i>
+                  <DeleteOutlinedIcon sx={{ fontSize: 20, alignSelf: 'center' }}/>
                 </button>
               </div>
-            </div>
+            </Paper>
           ))}
         </div>
       )}
@@ -293,11 +291,14 @@ const Library: React.FC = () => {
             <div key={book.id} className="book-list-item">
               <div className="book-details">
                 <div className="book-title">{book.title || "No Title"}</div>
-                {/* Other details can be added here if needed */}
               </div>
               <div className="book-list-options">
-                <button onClick={() => setActiveBook(book)}>Edit</button>
-                <button onClick={() => deleteBook(book.id)}>Delete</button>
+                <button onClick={() => setActiveBook(book)} className="edit-delete-list">
+                  <EditOutlinedIcon style={{ fontSize: "17px" }} />
+                </button>
+                <button onClick={() => deleteBook(book.id)} className="edit-delete-list">
+                  <DeleteOutlinedIcon style={{ fontSize: "17px" }} />
+                </button>
               </div>
             </div>
           ))}
@@ -314,16 +315,14 @@ const Library: React.FC = () => {
 
       {activeBook && (
         <div className="modal show-modal">
-          <div className="modal-content">
-            <span className="close" onClick={handleCloseModal}>
-              &times;
-            </span>
-            <AddBooksForm
-              book={activeBook}
-              onSave={saveBookData}
-              onClose={handleCloseModal}
-            />
-          </div>
+          <span className="close" onClick={handleCloseModal}>
+            &times;
+          </span>
+          <AddBooksForm
+            book={activeBook}
+            onSave={saveBookData}
+            onClose={handleCloseModal}
+          />
         </div>
       )}
     </div>

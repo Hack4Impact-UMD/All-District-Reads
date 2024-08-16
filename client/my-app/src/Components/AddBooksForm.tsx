@@ -12,6 +12,9 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { ActionCodeOperation } from "firebase/auth";
+import { Icon } from "@mui/material";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+
 
 //same thing as Library
 type ChapterQuestions = {
@@ -190,9 +193,9 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
     // Check if the chapter has a questions array, and if not, initialize it
     const updatedQuestions = [
       ...newChapters[chapterIndex].questions,
-      "Question",
+      "",
     ];
-    const updatedAnswers = [...newChapters[chapterIndex].answers, "Answer"];
+    const updatedAnswers = [...newChapters[chapterIndex].answers, ""];
 
     // Update the local copy of the chapters array with the new question and answer
     newChapters[chapterIndex] = {
@@ -245,7 +248,7 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
   );
   return (
     <div className="add-books-form">
-      <h1>Edit Book</h1>
+      <p className="edit-book-title">Edit Book</p>
       <button onClick={onClose} className="close-button">
         X
       </button>
@@ -319,27 +322,38 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
         </div>
         {activeChapterContent && (
           <div className="chapter-questions">
-            <h3>Chapter {activeChapterContent.chapterNumber}</h3>
+            <p className="chapter-heading">Chapter {activeChapterContent.chapterNumber}</p>
             {activeChapterContent.questions.map((question, questionIndex) => (
               <div key={questionIndex} className="question-item">
                 <label>
                   Question {questionIndex + 1}:
-                  <input
-                    type="text"
-                    value={question}
-                    onChange={(e) =>
-                      handleChapterQuestionChange(
-                        activeChapter - 1,
-                        e.target.value,
-                        questionIndex,
-                      )
+                  <div className="question-delete">
+                    <input
+                      type="text"
+                      value={question}
+                      onChange={(e) =>
+                        handleChapterQuestionChange(
+                          activeChapter - 1,
+                          e.target.value,
+                          questionIndex,
+                        )
+                      }
+                      placeholder="question"
+                      className="form-input"
+                    />
+                    <button
+                    type="button"
+                    onClick={() =>
+                      deleteQuestion(activeChapter - 1, questionIndex)
                     }
-                    placeholder="Example"
-                    className="form-input"
-                  />
+                    className="delete-question"
+                  >
+                  <DeleteOutlinedIcon style={{ fontSize: "20px" }} />
+                  </button>
+                </div>
                 </label>
                 <label>
-                  Answer:
+                  Answer/Additional Notes:
                   <input
                     type="text"
                     value={activeChapterContent?.answers[questionIndex]}
@@ -350,19 +364,10 @@ const AddBooksForm: React.FC<AddBookFormProps> = ({
                         questionIndex,
                       )
                     }
-                    placeholder="Example"
+                    placeholder="answer"
                     className="form-input"
                   />
                 </label>
-                <button
-                  type="button"
-                  onClick={() =>
-                    deleteQuestion(activeChapter - 1, questionIndex)
-                  }
-                  className="delete-question"
-                >
-                  X
-                </button>
               </div>
             ))}
             <button

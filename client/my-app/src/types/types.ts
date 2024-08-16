@@ -3,7 +3,8 @@ export enum UserType {
   Parent = "Parent",
   ADRStaff = "ADRStaff",
   SchoolStaff = "SchoolStaff",
-}
+};
+
 export type ReadingSchedule = {
   scheduleId: string;
   schoolDistrictId: string;

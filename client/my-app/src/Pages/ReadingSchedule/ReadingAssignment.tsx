@@ -42,6 +42,7 @@ const ReadingSchedule = () => {
   const [selectedChapter, setSelectedChapter] = useState<string>("");
   const [questions, setQuestions] = useState<string[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
   const [date, setDate] = useState<Dayjs | null>(null);
   const [chapterAssignmentTitle, setChapterAssignmentTitle] = useState("");
   const [assignmentDescription, setAssignmentDescription] = useState("");
@@ -81,6 +82,7 @@ const ReadingSchedule = () => {
           setSelectedReadingPeriod(data.readingPeriod || "");
           setDate(data.dueDate ? dayjs(data.dueDate, "MM/DD") : null);
           setSelectedQuestions(data.selectedQuestions || []);
+          setSelectedAnswers(data.selectedAnswers || []);
           setUrl(data.url || "");
         }
       }
@@ -142,6 +144,7 @@ const ReadingSchedule = () => {
       dueDate: date?.format("MM/DD"),
       schoolDistrictId: schoolDistrictId || "Unknown",
       selectedQuestions: selectedQuestions,
+      selectedAnswers: selectedAnswers,
       url: url,
     };
 
@@ -179,10 +182,29 @@ const ReadingSchedule = () => {
   };
 
   const handleQuestionToggle = (question: string) => {
+    const selectedChapterData = chapters.find(
+      (chap) => chap.chapterId === selectedChapter
+    );
+
+    if (!selectedChapterData) return;
+
+    const questionIndex = selectedChapterData.questions.indexOf(question);
+    const correspondingAnswer =
+      selectedChapterData.answers[questionIndex] || "";
+
     setSelectedQuestions((prevSelectedQuestions) => {
       if (prevSelectedQuestions.includes(question)) {
+        // Deselect question and answer
+        setSelectedAnswers((prevSelectedAnswers) =>
+          prevSelectedAnswers.filter((ans) => ans !== correspondingAnswer)
+        );
         return prevSelectedQuestions.filter((q) => q !== question);
       } else {
+        // Select question and answer
+        setSelectedAnswers((prevSelectedAnswers) => [
+          ...prevSelectedAnswers,
+          correspondingAnswer,
+        ]);
         return [...prevSelectedQuestions, question];
       }
     });
